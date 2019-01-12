@@ -1,6 +1,6 @@
 function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 %feedbackFMSynthesis generates a feedback FM signal using additive
-%synthesis
+% synthesis
 %
 % inputs:
 %   fVec: a vector of center frequencies in Hz
@@ -24,8 +24,6 @@ function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 % BVec = 0.9; % or BVec = g.^(0:N-1)' for a pitch glide
 % env = g.^(linspace(0, N, N));
 % [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs);
-
-
 
 % make sure parameters are all set
 N = length(env);

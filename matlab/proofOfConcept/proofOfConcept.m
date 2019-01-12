@@ -4,16 +4,24 @@
 % used to generate interesting percussive sounds. Sounds are generated for
 %   a) the 3x3 DWG mesh with a reflection coefficient at the boundaries
 %   b) the 3x3 DWG mesh with a one-zero lowpass filter at the boundaries
-%   c) modal synthesis using the frequencies found from the 3x3 mode steel 
-%       plate von Karman equations
+%   c) feedback FM with center frequency wc equal to the modal frequencies
+%       from (a)
 %   d) feedback FM with center frequency wc equal to the modal frequencies
-%       from (c)
-%   e) feedback FM with sounding frequency wc equal to the modal frequencies
-%       from (c)
-%   f) feedback FM with a pitch glide with center frequency wc equal to the 
-%       modal frequencies from (c)
-%   g) feedback FM with a pitch glide sounding frequency wc equal to the 
-%       modal frequencies from (c)
+%       from (a)
+%   e) feedback FM with a pitch glide with center frequency wc equal to the 
+%       modal frequencies from (a)
+%   f) feedback FM with a pitch glide sounding frequency wc equal to the 
+%       modal frequencies from (a)
+%   g) modal synthesis using the frequencies found from the 3x3 mode steel 
+%       plate von Karman equations
+%   h) feedback FM with center frequency wc equal to the modal frequencies
+%       from (g)
+%   i) feedback FM with sounding frequency wc equal to the modal frequencies
+%       from (g)
+%   j) feedback FM with a pitch glide with center frequency wc equal to the 
+%       modal frequencies from (g)
+%   k) feedback FM with a pitch glide sounding frequency wc equal to the 
+%       modal frequencies from (g)
 %
 % author: Jennifer Hsu
 % date: 1/11/2019
@@ -46,6 +54,12 @@ plotOn = 0;
 f1 = 5500;  % sounding frequency of a 3x3 digital waveguide mesh, Hz
 B = 0.9;    % feedback coefficient
 g = 0.9999; % pitch glide coefficient
+
+% time-varying APF
+TVAPFParams.M = fs/40;
+TVAPFParams.f_m = 100;
+TVAPFParams.f_b = fs/16;
+
 
 %% derived parameters
 N = fs*dur;
@@ -130,7 +144,25 @@ if plotSpectrograms == 1
     title('feedback FM synthesis using 3x3 mesh modal frequencies spectrogram 4') 
 end
 
+%% TIME-VARYING APF vs. MESH
 
+% EXAMPLE 1: time-varying APF center/sounding frequencies = mesh modal 
+% frequencies, fixed APF parameters
+[yTVAPFMesh1, yTVAPFMeshMat1, TVAPFParams1] = TVAPFSynthesis(fVecMesh, env, TVAPFParams, 0, fs);
+
+% EXAMPLE 2: time-varying APF center/sounding frequencies = mesh modal 
+% frequencies, randomized APF parameters - this sounds different everytime
+[yTVAPFMesh2, yTVAPFMeshMat2, TVAPFParams2] = TVAPFSynthesis(fVecMesh, env, TVAPFParams, 1, fs);
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(yTVAPFMesh1), hann(256), 128, 1024, fs, 'yaxis');
+    title('time-varying APF synthesis using 3x3 mesh modal frequencies spectrogram - fixed params')
+
+    figure
+    spectrogram(real(yTVAPFMesh2), hann(256), 128, 1024, fs, 'yaxis');
+    title('time-varying APF synthesis using 3x3 mesh modal frequencies spectrogram - random params')
+end
 
 
 %% MODAL SYNTHESIS
@@ -150,7 +182,6 @@ fcVecModal = fVecModal./(sqrt(1-B^2));
 % basic modal/additive synthesis with exponential decay using the modes
 yMS = zeros(1, N);
 nVec = 0:T:(dur-T);
-env = 0.9999.^(linspace(0, N, N)); % exponential decay
 
 for i=1:Nf
     f = fVecModal(i);
@@ -198,6 +229,26 @@ if plotSpectrograms == 1
     title('feedback FM synthesis using von Karman modal frequencies spectrogram 4')
 end
 
+%% TIME-VARYING APF vs. MODAL SYNTHESIS
+
+% EXAMPLE 1: time-varying APF center/sounding frequencies = mesh modal 
+% frequencies, fixed APF parameters
+[yTVAPFModal1, yTVAPFModalMat1, TVAPFParams1] = TVAPFSynthesis(fVecModal, env, TVAPFParams, 0, fs);
+
+% EXAMPLE 2: time-varying APF center/sounding frequencies = mesh modal 
+% frequencies, randomized APF parameters - this sounds different everytime
+[yTVAPFModal2, yTVAPFModalMat2, TVAPFParams2] = TVAPFSynthesis(fVecModal, env, TVAPFParams, 1, fs);
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(yTVAPFModal1), hann(256), 128, 1024, fs, 'yaxis');
+    title('time-varying APF synthesis using von Karman modal frequencies spectrogram - fixed params')
+
+    figure
+    spectrogram(real(yTVAPFModal2), hann(256), 128, 1024, fs, 'yaxis');
+    title('time-varying APF synthesis using von Karman modal frequencies spectrogram - random params')
+end
+
 %% write sounds to disk
 
 if writeAudioFiles == 1
@@ -217,6 +268,10 @@ if writeAudioFiles == 1
     audiowrite([outputDir 'yFBFMMesh3.wav'], scaleForSavingAudio(real(yFBFMMesh3)), fs)
     audiowrite([outputDir 'yFBFMMesh4.wav'], scaleForSavingAudio(real(yFBFMMesh4)), fs)
     
+    % time-varying APF vs. mesh
+    audiowrite([outputDir 'yTVAPFMesh1.wav'], scaleForSavingAudio(real(yTVAPFMesh1)), fs)
+    audiowrite([outputDir 'yTVAPFMesh2.wav'], scaleForSavingAudio(real(yTVAPFMesh2)), fs)
+    
     % von Karman modal synthesis
     audiowrite([outputDir 'yMS.wav'], scaleForSavingAudio(real(yMS)), fs)
     
@@ -225,5 +280,9 @@ if writeAudioFiles == 1
     audiowrite([outputDir 'yFBFMModal2.wav'], scaleForSavingAudio(real(yFBFMModal2)), fs)
     audiowrite([outputDir 'yFBFMModal3.wav'], scaleForSavingAudio(real(yFBFMModal3)), fs)
     audiowrite([outputDir 'yFBFMModal4.wav'], scaleForSavingAudio(real(yFBFMModal4)), fs)
+    
+    % time-varying APF vs. von Karman modal synthesis
+    audiowrite([outputDir 'yTVAPFModal1.wav'], scaleForSavingAudio(real(yTVAPFModal1)), fs)
+    audiowrite([outputDir 'yTVAPFModal2.wav'], scaleForSavingAudio(real(yTVAPFModal2)), fs)
 
 end
