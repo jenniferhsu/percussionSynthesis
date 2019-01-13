@@ -1,7 +1,8 @@
 % feedbackFMPOC.m
 % 
-% This script is a proof of concept that the feedback FM technique can be
-% used to generate interesting percussive sounds. Sounds are generated for
+% This script is a proof of concept that the feedback FM and time-varying
+% allpass filters technique can be used to generate interesting percussive
+% sounds. Sounds are generated for
 %   a) the 3x3 DWG mesh with a reflection coefficient at the boundaries
 %   b) the 3x3 DWG mesh with a one-zero lowpass filter at the boundaries
 %   c) feedback FM with center frequency wc equal to the modal frequencies
