@@ -8,7 +8,7 @@ N = 2*fs;
 outputDir = 'audioExamples/convolutionalSynth/';
 
 % modal synthesis signal and resonating body impulse response locations
-yMSWav = 'audioExamples/yTVAPFModal1.wav';
+yMSWav = 'audioExamples/yTVAPFModal2.wav';
 resIRwav = 'resonatorIRs/CarpenterCenter.wav';
 %resIRwav = 'resonatorIRs/3000CStreetGarageStairwell.wav';
 
@@ -70,9 +70,12 @@ y5 = y5(1:N);
 
 
 %% variable width pulse (hann window)
-durPulse = .10;
+durPulse = .10; % this doesn't change the resulting sound really
 sampPulse = ceil(durPulse*fs);
-sampAttack = 50;
+if mod(sampPulse, 2) ~= 0
+    sampPulse = sampPulse + 1;
+end
+sampAttack = 50; % shortening this creates a brighter sound
 w = hann(sampPulse)';
 excitations(:,6) = [linspace(0, 1, sampAttack) ones(1, (sampPulse/2)-sampAttack) w(sampPulse/2:end) zeros(1, N-sampPulse-1)];
 y6 = percSynth(excitations(:,6), yMSWav, resIRwav);

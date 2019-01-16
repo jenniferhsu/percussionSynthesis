@@ -1,9 +1,9 @@
 function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 %feedbackFMSynthesis generates a feedback FM signal using additive
-% synthesis
+% synthesis with the rotation formulation of FBFM
 %
 % inputs:
-%   fVec: a vector of center frequencies in Hz
+%   fVec: a vector of center frequencies in Hz (wc = 2*pi*fVec)
 %   BVec: for pitch glides, this is a vector of B coefficient values
 %       if a pitch glide is not desired, this can be a single number
 %   env: amplitude envelope with length equal to the desired length for the
@@ -29,6 +29,8 @@ function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 N = length(env);
 Nf = length(fVec);
 T = 1/fs;
+nT = 0:T:((N/fs)-T);
+
 
 if length(BVec) == 1
     BVec = BVec * ones(1, N);
@@ -47,6 +49,8 @@ for i=1:Nf
     yFBFMMat(i,:) = yFBFMMat(i,:).*env;
 end
 yFBFM = sum(yFBFMMat, 1);
+
+
 
 end
 

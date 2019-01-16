@@ -1,4 +1,4 @@
-% feedbackFMPOC.m
+% proofOfConcept.m
 % 
 % This script is a proof of concept that the feedback FM and time-varying
 % allpass filters technique can be used to generate interesting percussive
@@ -145,6 +145,41 @@ if plotSpectrograms == 1
     title('feedback FM synthesis using 3x3 mesh modal frequencies spectrogram 4') 
 end
 
+%% STRETCHED APF vs. MESH
+
+b0 = (sqrt(1-B^2) - 1)/B;
+fVecMesh_wc = fVecMesh*sqrt(1 - B^2);
+
+% EXAMPLE 1: wc = mesh modal frequencies
+[ySAPFMesh1, ySAPFMeshMat1] = stretchedAPFSynthesis(fVecMesh, b0, env, fs, [], 'none');
+
+% EXAMPLE 2: w0 = mesh modal frequencies
+[ySAPFMesh2, ySAPFMeshMat2] = stretchedAPFSynthesis(fVecMesh_wc, b0, env, fs, [], 'none');
+
+% EXAMPLE 3: feedback FM with FBFM pitch glide with wc = mesh modal frequencies
+[ySAPFMesh3, ySAPFMeshMat3] = stretchedAPFSynthesis(fVecMesh, b0, env, fs, fVecMesh, 'fbfm');
+
+% EXAMPLE 4: feedback FM with pitch glide with w0 = mesh modal frequencies
+[ySAPFMesh4, ySAPFMeshMat4] = stretchedAPFSynthesis(fVecMesh_wc, b0, env, fs, fVecMesh_wc, 'fbfm');
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(ySAPFMesh1), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 1')
+
+    figure
+    spectrogram(real(ySAPFMesh2), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 2')
+
+    figure
+    spectrogram(real(ySAPFMesh3), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 3')
+
+    figure
+    spectrogram(real(ySAPFMesh4), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 4') 
+end
+
 %% TIME-VARYING APF vs. MESH
 
 % EXAMPLE 1: time-varying APF center/sounding frequencies = mesh modal 
@@ -230,6 +265,42 @@ if plotSpectrograms == 1
     title('feedback FM synthesis using von Karman modal frequencies spectrogram 4')
 end
 
+%% STRETCHED APF vs. MODAL SYNTHESIS
+
+b0 = (sqrt(1-B^2) - 1)/B;
+fVecModal_wc = fVecModal*sqrt(1 - B^2);
+
+% EXAMPLE 1: wc = mesh modal frequencies
+[ySAPFModal1, ySAPFModalMat1] = stretchedAPFSynthesis(fVecModal, b0, env, fs, [], 'none');
+
+% EXAMPLE 2: w0 = mesh modal frequencies
+[ySAPFModal2, ySAPFModalMat2] = stretchedAPFSynthesis(fVecModal_wc, b0, env, fs, [], 'none');
+
+% EXAMPLE 3: feedback FM with FBFM pitch glide with wc = mesh modal frequencies
+[ySAPFModal3, ySAPFModalMat3] = stretchedAPFSynthesis(fVecModal, b0, env, fs, fVecModal, 'fbfm');
+
+% EXAMPLE 4: feedback FM with pitch glide with w0 = mesh modal frequencies
+[ySAPFModal4, ySAPFModalMat4] = stretchedAPFSynthesis(fVecModal_wc, b0, env, fs, fVecModal_wc, 'fbfm');
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(ySAPFModal1), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 1')
+
+    figure
+    spectrogram(real(ySAPFModal2), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 2')
+
+    figure
+    spectrogram(real(ySAPFModal3), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 3')
+
+    figure
+    spectrogram(real(ySAPFModal4), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 4') 
+end
+
+
 %% TIME-VARYING APF vs. MODAL SYNTHESIS
 
 % EXAMPLE 1: time-varying APF center/sounding frequencies = mesh modal 
@@ -269,20 +340,32 @@ if writeAudioFiles == 1
     audiowrite([outputDir 'yFBFMMesh3.wav'], scaleForSavingAudio(real(yFBFMMesh3)), fs)
     audiowrite([outputDir 'yFBFMMesh4.wav'], scaleForSavingAudio(real(yFBFMMesh4)), fs)
     
+    % stretched APF vs. mesh
+    audiowrite([outputDir 'ySAPFMesh1.wav'], scaleForSavingAudio(real(ySAPFMesh1)), fs)
+    audiowrite([outputDir 'ySAPFMesh2.wav'], scaleForSavingAudio(real(ySAPFMesh2)), fs)
+    audiowrite([outputDir 'ySAPFMesh3.wav'], scaleForSavingAudio(real(ySAPFMesh3)), fs)
+    audiowrite([outputDir 'ySAPFMesh4.wav'], scaleForSavingAudio(real(ySAPFMesh4)), fs)
+    
     % time-varying APF vs. mesh
     audiowrite([outputDir 'yTVAPFMesh1.wav'], scaleForSavingAudio(real(yTVAPFMesh1)), fs)
     audiowrite([outputDir 'yTVAPFMesh2.wav'], scaleForSavingAudio(real(yTVAPFMesh2)), fs)
     
-    % von Karman modal synthesis
+    % steel plate modal synthesis
     audiowrite([outputDir 'yMS.wav'], scaleForSavingAudio(real(yMS)), fs)
     
-    % feedback FM vs. von Karman modal synthesis
+    % feedback FM vs. steel plate modal synthesis
     audiowrite([outputDir 'yFBFMModal1.wav'], scaleForSavingAudio(real(yFBFMModal1)), fs)
     audiowrite([outputDir 'yFBFMModal2.wav'], scaleForSavingAudio(real(yFBFMModal2)), fs)
     audiowrite([outputDir 'yFBFMModal3.wav'], scaleForSavingAudio(real(yFBFMModal3)), fs)
     audiowrite([outputDir 'yFBFMModal4.wav'], scaleForSavingAudio(real(yFBFMModal4)), fs)
     
-    % time-varying APF vs. von Karman modal synthesis
+    % stretched APF vs. steel plate modal synthesis
+    audiowrite([outputDir 'ySAPFModal1.wav'], scaleForSavingAudio(real(ySAPFModal1)), fs)
+    audiowrite([outputDir 'ySAPFModal2.wav'], scaleForSavingAudio(real(ySAPFModal2)), fs)
+    audiowrite([outputDir 'ySAPFModal3.wav'], scaleForSavingAudio(real(ySAPFModal3)), fs)
+    audiowrite([outputDir 'ySAPFModal4.wav'], scaleForSavingAudio(real(ySAPFModal4)), fs)
+    
+    % time-varying APF vs. steel plate modal synthesis
     audiowrite([outputDir 'yTVAPFModal1.wav'], scaleForSavingAudio(real(yTVAPFModal1)), fs)
     audiowrite([outputDir 'yTVAPFModal2.wav'], scaleForSavingAudio(real(yTVAPFModal2)), fs)
 

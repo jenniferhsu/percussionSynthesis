@@ -27,6 +27,10 @@ function [yTVAPF, yTVAPFMat, TVAPFParamsUsed] = TVAPFSynthesis(fVec, env, TVAPFP
 % N = fs*dur;
 % fVec = 10^3 * [5.5000 7.6389 9.7778]; 
 % env = g.^(linspace(0, N, N));
+% TVAPFParams.M = fs/40;
+% TVAPFParams.f_m = 100;
+% TVAPFParams.f_b = fs/16;
+% r = 1
 % [yTVAPF, yTVAPFMat] = TVAPFSynthesis(fVec, env, fs);
 
 % make sure parameters are all set
