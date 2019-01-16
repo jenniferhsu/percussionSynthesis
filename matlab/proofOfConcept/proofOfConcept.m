@@ -200,6 +200,43 @@ if plotSpectrograms == 1
     title('time-varying APF synthesis using 3x3 mesh modal frequencies spectrogram - random params')
 end
 
+%% STRETCHED APF & TIME-VARYING APF vs. MESH
+% all time-varying APF calls here use randomized parameters
+
+b0 = (sqrt(1-B^2) - 1)/B;
+fVecMesh_wc = fVecMesh*sqrt(1 - B^2);
+
+% EXAMPLE 1: wc = mesh modal frequencies
+[ySTVAPFMesh1, ySTVAPFMeshMat1, ~] = stretchedAPFAndTVAPFSynthesis(fVecMesh, b0, env, TVAPFParams, 1, fs, [], 'none');
+
+% EXAMPLE 2: w0 = mesh modal frequencies
+[ySTVAPFMesh2, ySTVAPFMeshMat2, ~] = stretchedAPFAndTVAPFSynthesis(fVecMesh_wc, b0, env, TVAPFParams, 1, fs, [], 'none');
+
+% EXAMPLE 3: feedback FM with FBFM pitch glide with wc = mesh modal frequencies
+[ySTVAPFMesh3, ySTVAPFMeshMat3, ~] = stretchedAPFAndTVAPFSynthesis(fVecMesh, b0, env, TVAPFParams, 1, fs, fVecMesh, 'fbfm');
+
+% EXAMPLE 4: feedback FM with pitch glide with w0 = mesh modal frequencies
+[ySTVAPFMesh4, ySTVAPFMeshMat4, ~] = stretchedAPFAndTVAPFSynthesis(fVecMesh, b0, env, TVAPFParams, 1, fs, fVecMesh_wc, 'fbfm');
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(ySTVAPFMesh1), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 1')
+
+    figure
+    spectrogram(real(ySTVAPFMesh2), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 2')
+
+    figure
+    spectrogram(real(ySTVAPFMesh3), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 3')
+
+    figure
+    spectrogram(real(ySTVAPFMesh4), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 4') 
+end
+
+
 
 %% MODAL SYNTHESIS
 
@@ -250,19 +287,19 @@ end
 if plotSpectrograms == 1
     figure
     spectrogram(real(yFBFMModal1), hann(256), 128, 1024, fs, 'yaxis');
-    title('feedback FM synthesis using von Karman modal frequencies spectrogram 1')
+    title('feedback FM synthesis using theoretical steel plate modal frequencies spectrogram 1')
 
     figure
     spectrogram(real(yFBFMModal2), hann(256), 128, 1024, fs, 'yaxis');
-    title('feedback FM synthesis using von Karman modal frequencies spectrogram 2')
+    title('feedback FM synthesis using theoretical steel plate modal frequencies spectrogram 2')
 
     figure
     spectrogram(real(yFBFMModal3), hann(256), 128, 1024, fs, 'yaxis');
-    title('feedback FM synthesis using von Karman modal frequencies spectrogram 3')
+    title('feedback FM synthesis using theoretical steel plate modal frequencies spectrogram 3')
 
     figure
     spectrogram(real(yFBFMModal4), hann(256), 128, 1024, fs, 'yaxis');
-    title('feedback FM synthesis using von Karman modal frequencies spectrogram 4')
+    title('feedback FM synthesis using theoretical steel plate modal frequencies spectrogram 4')
 end
 
 %% STRETCHED APF vs. MODAL SYNTHESIS
@@ -285,21 +322,20 @@ fVecModal_wc = fVecModal*sqrt(1 - B^2);
 if plotSpectrograms == 1
     figure
     spectrogram(real(ySAPFModal1), hann(256), 128, 1024, fs, 'yaxis');
-    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 1')
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 1')
 
     figure
     spectrogram(real(ySAPFModal2), hann(256), 128, 1024, fs, 'yaxis');
-    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 2')
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 2')
 
     figure
     spectrogram(real(ySAPFModal3), hann(256), 128, 1024, fs, 'yaxis');
-    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 3')
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 3')
 
     figure
     spectrogram(real(ySAPFModal4), hann(256), 128, 1024, fs, 'yaxis');
-    title('stretched APF synthesis using 3x3 mesh modal frequencies spectrogram 4') 
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 4') 
 end
-
 
 %% TIME-VARYING APF vs. MODAL SYNTHESIS
 
@@ -314,12 +350,50 @@ end
 if plotSpectrograms == 1
     figure
     spectrogram(real(yTVAPFModal1), hann(256), 128, 1024, fs, 'yaxis');
-    title('time-varying APF synthesis using von Karman modal frequencies spectrogram - fixed params')
+    title('time-varying APF synthesis using theoretical steel plate modal frequencies spectrogram - fixed params')
 
     figure
     spectrogram(real(yTVAPFModal2), hann(256), 128, 1024, fs, 'yaxis');
-    title('time-varying APF synthesis using von Karman modal frequencies spectrogram - random params')
+    title('time-varying APF synthesis using theoretical steel plate modal frequencies spectrogram - random params')
 end
+
+
+%% STRETCHED APF & TIME-VARYING APF vs. MODAL SYNTHESIS
+% all time-varying APF calls here use randomized parameters
+
+b0 = (sqrt(1-B^2) - 1)/B;
+fVecModal_wc = fVecModal*sqrt(1 - B^2);
+
+% EXAMPLE 1: wc = mesh modal frequencies
+[ySTVAPFModal1, ySTVAPFModalMat1, ~] = stretchedAPFAndTVAPFSynthesis(fVecModal, b0, env, TVAPFParams, 1, fs, [], 'none');
+
+% EXAMPLE 2: w0 = mesh modal frequencies
+[ySTVAPFModal2, ySTVAPFModalMat2, ~] = stretchedAPFAndTVAPFSynthesis(fVecModal_wc, b0, env, TVAPFParams, 1, fs, [], 'none');
+
+% EXAMPLE 3: feedback FM with FBFM pitch glide with wc = mesh modal frequencies
+[ySTVAPFModal3, ySTVAPFModalMat3, ~] = stretchedAPFAndTVAPFSynthesis(fVecModal, b0, env, TVAPFParams, 1, fs, fVecModal, 'fbfm');
+
+% EXAMPLE 4: feedback FM with pitch glide with w0 = mesh modal frequencies
+[ySTVAPFModal4, ySTVAPFModalMat4, ~] = stretchedAPFAndTVAPFSynthesis(fVecModal, b0, env, TVAPFParams, 1, fs, fVecModal_wc, 'fbfm');
+
+if plotSpectrograms == 1
+    figure
+    spectrogram(real(ySTVAPFModal1), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 1')
+
+    figure
+    spectrogram(real(ySTVAPFModal2), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 2')
+
+    figure
+    spectrogram(real(ySTVAPFModal3), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 3')
+
+    figure
+    spectrogram(real(ySTVAPFModal4), hann(256), 128, 1024, fs, 'yaxis');
+    title('stretched APF synthesis using theoretical steel plate modal frequencies spectrogram 4') 
+end
+
 
 %% write sounds to disk
 
@@ -350,6 +424,12 @@ if writeAudioFiles == 1
     audiowrite([outputDir 'yTVAPFMesh1.wav'], scaleForSavingAudio(real(yTVAPFMesh1)), fs)
     audiowrite([outputDir 'yTVAPFMesh2.wav'], scaleForSavingAudio(real(yTVAPFMesh2)), fs)
     
+    % stretched APF and time-varying APF vs. mes
+    audiowrite([outputDir 'ySTVAPFMesh1.wav'], scaleForSavingAudio(real(ySTVAPFMesh1)), fs)
+    audiowrite([outputDir 'ySTVAPFMesh2.wav'], scaleForSavingAudio(real(ySTVAPFMesh2)), fs)
+    audiowrite([outputDir 'ySTVAPFMesh3.wav'], scaleForSavingAudio(real(ySTVAPFMesh3)), fs)
+    audiowrite([outputDir 'ySTVAPFMesh4.wav'], scaleForSavingAudio(real(ySTVAPFMesh4)), fs)
+    
     % steel plate modal synthesis
     audiowrite([outputDir 'yMS.wav'], scaleForSavingAudio(real(yMS)), fs)
     
@@ -368,5 +448,14 @@ if writeAudioFiles == 1
     % time-varying APF vs. steel plate modal synthesis
     audiowrite([outputDir 'yTVAPFModal1.wav'], scaleForSavingAudio(real(yTVAPFModal1)), fs)
     audiowrite([outputDir 'yTVAPFModal2.wav'], scaleForSavingAudio(real(yTVAPFModal2)), fs)
+    
+    % stretched APF and time-varying APF vs. steel plate modal synthesis
+    audiowrite([outputDir 'ySTVAPFModal1.wav'], scaleForSavingAudio(real(ySTVAPFModal1)), fs)
+    audiowrite([outputDir 'ySTVAPFModal2.wav'], scaleForSavingAudio(real(ySTVAPFModal2)), fs)
+    audiowrite([outputDir 'ySTVAPFModal3.wav'], scaleForSavingAudio(real(ySTVAPFModal3)), fs)
+    audiowrite([outputDir 'ySTVAPFModal4.wav'], scaleForSavingAudio(real(ySTVAPFModal4)), fs)
+    
+    
+    
 
 end
