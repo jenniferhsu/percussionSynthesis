@@ -39,6 +39,9 @@ function [ySAPF, ySAPFMat] = stretchedAPFSynthesis(fVec, b0, env, fs, fVecEnd, p
 % env = g.^(linspace(0, N, N));
 % [ySAPF, ySAPFMat] = stretchedAPFSynthesis(fVec, b0, env, fs, fVecEnd, 'linear');
 
+% set this to 1 if you want to make plots for SMC 2019 paper
+SMC2019PLOT = 0;
+
 % make sure parameters are all set
 N = length(env);
 Nf = length(fVec);
@@ -47,6 +50,9 @@ nT = 0:T:((N/fs)-T);
 
 % synthesize feedback FM signal using the strecthed allpass filter
 ySAPFMat = zeros(Nf, N);
+
+% for SMC 2019 plotting
+osc = zeros(Nf, N);
 
 for i=1:Nf
     f = fVec(i);
@@ -91,6 +97,7 @@ for i=1:Nf
     
     % stretched allpass filter
     ySAPFMat(i,:) = (b0Vec + exp(1j*Theta)) ./ (1 + b0Vec.*exp(1j*Theta));
+    osc(i,:) = ySAPFMat(i,:); % for SMC 2019 plotting
      
 %     relationships that might be useful
 %     wc = w0 / sqrt(1 - ((-2*b0)/(b0^2 + 1))^2);
@@ -121,6 +128,59 @@ for i=1:Nf
     ySAPFMat(i,:) = ySAPFMat(i,:).*env;
 end
 ySAPF = sum(ySAPFMat, 1);
+
+if SMC2019PLOT==1
+    
+    % LOOPBACK FM WITH ADDITIVE SYNTHESIS
+    figure
+    subplot(311); plot(real(osc(1, 1:100)), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+    
+    subplot(312); plot(real(osc(2, 1:100)), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+    
+    subplot(313); plot(real(osc(3, 1:100)), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 6];
+    print(['~/Documents/ucsd/winter2019/smc/background_planning/figure_making/' 'loopbackFMOsc'], '-deps', '-r0')
+
+    % ENVELOPE
+    figure
+    subplot(311); plot(real(env), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+    
+    subplot(312); plot(real(env), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+    
+    subplot(313); plot(real(env), 'linewidth', 2)
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 6];
+    print(['~/Documents/ucsd/winter2019/smc/background_planning/figure_making/' 'loopbackFMEnv'], '-deps', '-r0')
+    
+    
+    % ADDITIVE SYNTHESIS RESULT
+    figure
+    plot(nT, ySAPF, 'linewidth', 2);
+    set(gca,'linewidth', 3)
+    set(gca,'XTick',[], 'YTick', [])
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print(['~/Documents/ucsd/winter2019/smc/background_planning/figure_making/' 'additiveSynthesisResult'], '-deps', '-r0')
+keyboard
+end
 
 end
 

@@ -10,7 +10,6 @@ N = 2*fs;
 %inputDir = 'audioExamples/FBFMStretchedAPFAndTimeVaryingAPF/';
 inputDir = 'audioExamples/timeVaryingAPF/';
 
-
 outputDir = ['audioExamples/' inputDir(15:end) 'convolutionalSynth/'];
 if ~exist(outputDir)
     mkdir(outputDir)
