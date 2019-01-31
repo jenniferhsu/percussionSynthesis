@@ -55,6 +55,22 @@ print([outDir 'excitation_derivative'], '-deps', '-r0')
 % look at stretchedAPFSynthesis.m in proofOfConcept directory and print
 % from there
 
+%% RESONANT BODY IMPULSE RESPONSE
+%%%%%%%%%%%%%%%%%
+resIRWav = '../proofOfConcept/resonatorIRs/taiko/taiko2.wav';
+[resIR, fsr] = audioread(resIRWav);
+resIR = resIR(2159:end,1);
+t = linspace(0, length(resIR)/fsr, length(resIR));
+
+figure
+plot(t, resIR, 'linewidth', 1);
+xlim([t(1) t(end)])
+set(gca,'linewidth', 3)
+set(gca,'XTick',[], 'YTick', [])
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 3];
+print([outDir 'resonantBodyIR'], '-deps', '-r0')
 
 
 %% OUTPUT SIGNAL

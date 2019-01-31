@@ -71,7 +71,7 @@ for i=1:Nf
         b0Vec = b0 * ones(1, N);
         
         C = 0; 
-        Theta = (m/2*nT.^2) + b*nT + C;
+        Theta = 2*pi*((m/2*nT.^2) + b*nT + C);
     elseif strcmp(pitchGlideMode, 'exp')
         tau = 1/(log(fVecEnd(i)/f));
         %f0 = f*exp(nT./tau);
@@ -92,7 +92,7 @@ for i=1:Nf
         b0Vec = (sqrt(1 - B.^2) - 1)./B;
         
         C = 0;                      % constant of integration
-        Theta = (fVecEnd(i)*T/log(g)) .* (u - atanh(u) + C);
+        Theta = (2*pi*fVecEnd(i)*T/log(g)) .* (u - atanh(u) + C);
     end
     
     % stretched allpass filter

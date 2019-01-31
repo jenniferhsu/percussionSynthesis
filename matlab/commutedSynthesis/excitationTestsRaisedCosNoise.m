@@ -20,8 +20,8 @@ yMSWav = '../proofOfConcept/audioExamples/membrane/kettledrum-ySAPFMemb2.wav';
 [yMS, ~] = audioread(yMSWav);
 
 % get things ready for saving
-if ~exist([outputDir 'Bezier/'])
-    mkdir([outputDir 'Bezier/'])
+if ~exist([outputDir 'raisedCosine/'])
+    mkdir([outputDir 'raisedCosine/'])
 end
 if ~exist([outputDir 'noiseBurst/'])
     mkdir([outputDir 'noiseBurst/'])
@@ -31,7 +31,7 @@ tokens = strsplit(yMSWav, '/');
 wavFileName = tokens{end};
 
 
-%% BEZIER CURVES
+%% RAISED COSINE
 % making winLength shorter retains more of the higher frequencies
 % longer winLength removes the higher frequencies and gives a bassier sound
 % the curve doesn't make a difference, so let's change it to the end of a
@@ -65,7 +65,7 @@ for i = 1:Nwl
     %y = y(winLength:end);
 
     if WRITETOFILE == 1
-        audiowrite([outputDir 'Bezier/' wavFileName(1:end-4) '_winLength_' num2str(winLength) '_P1x_' num2str(P1x) '_P1y_' num2str(P1y) '.wav'], ...
+        audiowrite([outputDir 'raisedCosine/' wavFileName(1:end-4) '_winLength_' num2str(winLength) '_P1x_' num2str(P1x) '_P1y_' num2str(P1y) '.wav'], ...
             scaleForSavingAudio(y), fs);
     end
 
@@ -95,11 +95,9 @@ L = length(lowFreq);
 H = length(highFreq);
 
  for j=1:L
-        for k=1:H
-               
-                    for i=1:D
+    for k=1:H
+        for i=1:D
 
-            
             % excitation
             e = zeros(N,1); 
             
