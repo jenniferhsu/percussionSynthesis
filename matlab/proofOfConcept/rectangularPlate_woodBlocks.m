@@ -12,7 +12,7 @@ writeAudioFiles = 1;
 % feedback FM
 B = 0.9;    % feedback coefficient
 g = 0.9999; % pitch glide coefficient
-gWood = 0.997;
+gWood = 0.998;
 
 % time-varying APF
 TVAPFParams.M = fs/40;
@@ -22,8 +22,6 @@ TVAPFParams.f_b = fs/16;
 %% derived parameters
 N = fs*dur;
 T = 1/fs;
-envWood = gWood.^(linspace(0, N, N)); % exponential decay for woodblock
-env = g.^(linspace(0, N, N));   % exponential decay
 BVec = g.^(0:N-1)';             % feedback FM pitch glide coefficient
 
 %% rectangular plate with a simply supported edge
@@ -54,13 +52,32 @@ Nf = length(fVecRP);
 % modal freqeuncies
 fcVecRP = fVecRP./(sqrt(1-B^2));
 
+%% set up decay envelopes
+% want the lowest modal frequencies to have a larger starting amplitude 
+% than the highest modal frequencies
+aStart = zeros(1, Nf);
+aStart(1) = 1;              % highest amplitude for lowest modal freq
+aStart(Nf) = 0.01;          % lowest amplitude for highest modal freq
+tau = -(Nf-1) / log(aStart(Nf));
+a0 = 1/exp(-1/tau);
+aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
+                                            % starting amplitudes
+
+e = g.^(linspace(0, N, N));   % exponential decay
+eWood = gWood.^(linspace(0, N, N)); % exponential decay for woodblock
+
+envWood = zeros(Nf, N);
+for i=1:Nf
+    envWood(i,:) = aStart(i) * eWood;
+end
+
 %% modal synthesis with exponential decay using the modes
 yMS = zeros(1, N);
 nVec = 0:T:(dur-T);
 
 for i=1:Nf
     f = fVecRP(i);
-    yMS = yMS + (exp(1j*2*pi*f*nVec) .* envWood);
+    yMS = yMS + (exp(1j*2*pi*f*nVec) .* envWood(i,:));
 end
 
 if plotSpectrograms == 1

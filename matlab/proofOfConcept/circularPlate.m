@@ -9,7 +9,7 @@ plotSpectrograms = 0;
 writeAudioFiles = 1;
 
 % feedback FM
-B = 0.9;    % feedback coefficient
+B = 0.99;    % feedback coefficient
 g = 0.9999; % pitch glide coefficient
 
 % time-varying APF
@@ -20,7 +20,6 @@ TVAPFParams.f_b = fs/16;
 %% derived parameters
 N = fs*dur;
 T = 1/fs;
-env = g.^(linspace(0, N, N));   % exponential decay
 BVec = g.^(0:N-1)';             % feedback FM pitch glide coefficient
 
 %% circular plate with a clamped edge
@@ -42,12 +41,30 @@ cL = sqrt(E/(rho*(1 - v^2)));
 f01 = 0.2287 * cL * h / a^2;
 fVecCP = f01 * [1, 2.80, 5.15, 5.98, 9.75, 14.09, 14.91, 20.66, 26.99];
 
-
 Nf = length(fVecCP);
 
 % center frequencies for feedback FM if sounding frequencies = membrane
 % modal freqeuncies
 fcVecCP = fVecCP./(sqrt(1-B^2));
+
+%% set up decay envelopes
+% want the lowest modal frequencies to have a larger starting amplitude 
+% than the highest modal frequencies
+aStart = zeros(1, Nf);
+aStart(1) = 1;              % highest amplitude for lowest modal freq
+aStart(Nf) = 0.5;          % lowest amplitude for highest modal freq
+tau = -(Nf-1) / log(aStart(Nf));
+a0 = 1/exp(-1/tau);
+aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
+                                            % starting amplitudes
+
+e = g.^(linspace(0, N, N));   % exponential decay
+
+env = zeros(Nf, N);
+for i=1:Nf
+    env(i,:) = aStart(i) * e;
+end
+
 
 %% modal synthesis with exponential decay using the modes
 yMS = zeros(1, N);
@@ -55,7 +72,7 @@ nVec = 0:T:(dur-T);
 
 for i=1:Nf
     f = fVecCP(i);
-    yMS = yMS + (exp(1j*2*pi*f*nVec) .* env);
+    yMS = yMS + (exp(1j*2*pi*f*nVec) .* env(i,:));
 end
 
 if plotSpectrograms == 1
@@ -77,10 +94,12 @@ end
 % EXAMPLE 3: feedback FM with pitch glide with center frequencies = membrane
 % modal frequencies (YES)
 % cool for bass drum
-[yFBFMCP3, yFBFMCPMat3] = feedbackFMSynthesis(fVecCP, BVec, env, fs);
+BVec = linspace(0.99, 0.989, N);
+[yFBFMCP3, yFBFMCPMat3] = feedbackFMSynthesis(fcVecCP, BVec, env, fs);
 
 % EXAMPLE 4: feedback FM with pitch glide with sounding frequencies = membrane
 % modal frequencies
+BVec = linspace(0.91, 0.9, N);
 [yFBFMCP4, yFBFMCPMat4] = feedbackFMSynthesis(fcVecCP, BVec, env, fs);
 
 
@@ -94,15 +113,21 @@ fVecCP_wc = fVecCP*sqrt(1 - B^2);
 
 % EXAMPLE 2: w0 = membrane modal frequencies (YES)
 % cool for bass drum
-[ySAPFCP2, ySAPFCPMat2] = stretchedAPFSynthesis(fVecCP_wc, b0, env, fs, [], 'none');
+[ySAPFCP2, ySAPFCPMat2] = stretchedAPFSynthesis(fcVecCP, b0, env, fs, [], 'none');
 
 % EXAMPLE 3: feedback FM with FBFM pitch glide with wc = membrane modal
-% frequencies (YES)
-[ySAPFCP3, ySAPFCPMat3] = stretchedAPFSynthesis(fVecCP, b0, env, fs, fVecCP*2, 'fbfm');
+% frequencies 
+BVec = linspace(0.99, 0.989, N);
+fcVecCPStart = fcVecCP .* sqrt(1 - BVec(1)^2);
+fcVecCPEnd = fcVecCP .* sqrt(1 - BVec(end)^2);
+[ySAPFCP3, ySAPFCPMat3] = stretchedAPFSynthesis(fcVecCPStart, b0, env, fs, fcVecCPEnd, 'linear');
 
 % EXAMPLE 4: feedback FM with pitch glide with w0 = membrane modal
 % frequencies (YES)
-[ySAPFCP4, ySAPFCPMat4] = stretchedAPFSynthesis(fVecCP, b0, env, fs, fVecCP*1.2, 'linear');
+BVec = linspace(0.989, 0.99, N);
+fcVecCPStart = fcVecCP .* sqrt(1 - BVec(1)^2);
+fcVecCPEnd = fcVecCP .* sqrt(1 - BVec(end)^2);
+[ySAPFCP4, ySAPFCPMat4] = stretchedAPFSynthesis(fcVecCPStart, b0, env, fs, fcVecCPEnd, 'linear');
 
 %% TIME-VARYING APF
 

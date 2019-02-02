@@ -6,6 +6,9 @@ function [yTVAPF, yTVAPFMat, TVAPFParamsUsed] = TVAPFSynthesis(fVec, env, TVAPFP
 %   fVec: a vector of center frequencies in Hz
 %   env: amplitude envelope with length equal to the desired length for the
 %       output signal. 
+%       ** If this is a matrix, it should be of dimensions
+%       "length of fVec" by "desired output signal length" and each
+%       envelope will be used for a different frequency in fVec.
 %   TVAPFParams: struct that holds time-varying allpass filter parameters 
 %       M, f_m, and f_b. 
 %   r: if r==0, use fixed parameters for TVAPFParams. if r==1, use randomly
@@ -34,11 +37,18 @@ function [yTVAPF, yTVAPFMat, TVAPFParamsUsed] = TVAPFSynthesis(fVec, env, TVAPFP
 % [yTVAPF, yTVAPFMat] = TVAPFSynthesis(fVec, env, fs);
 
 % make sure parameters are all set
-N = length(env);
-dur = N/fs;
 Nf = length(fVec);
+N = size(env, 2);
+
+dur = N/fs;
 T = 1/fs;
 nVec = 0:T:(dur-T);
+
+% set up the envelope matrix
+if size(env, 1)==1
+    % repeat env as a matrix
+    env = repmat(env, [Nf, 1]);
+end
 
 M = TVAPFParams.M;
 f_m = TVAPFParams.f_m;
@@ -97,7 +107,7 @@ for i=1:Nf
                         TVAPFParamsUsed.f_m(i), fs);
     
     % multiply with amplitude envelope
-    yTVAPFMat(i,:) = x .* env;
+    yTVAPFMat(i,:) = x .* env(i,:);
     
 end
 yTVAPF = sum(yTVAPFMat, 1);

@@ -9,8 +9,14 @@ fs = 44100;
 N = 2*fs;
 
 % modal synthesis signal location 
-yMSWav = '../proofOfConcept/audioExamples/membrane/kettledrum-ySAPFMemb2.wav';
+%yMSWav = '../proofOfConcept/audioExamples/marimba/yFBFMMemb2.wav';
+%yMSWav = '../proofOfConcept/audioExamples/membrane/kettledrum/ySAPFMemb2.wav';
+%yMSWav = '../proofOfConcept/audioExamples/membrane/bass-drum/ySAPFMemb2.wav';
+%yMSWav = '../proofOfConcept/audioExamples/membrane/o-daiko/ySAPFMemb3.wav';
+%yMSWav = '../proofOfConcept/audioExamples/tomtom/ySAPFMemb2.wav';
 %yMSWav = 'audioExamples/timeVaryingAPF/yTVAPFModal2.wav';
+yMSWav = '../proofOfConcept/audioExamples/marimba/yFBFMMemb2.wav';
+%yMSWav = '../proofOfConcept/audioExamples/marimba/yMS.wav';
 
 % resonating body impulse response location
 %resIRWav = '../proofOfConcept/resonatorIRs/195790__klankbeeld__cinematic-boom-130730-06.wav';
@@ -20,11 +26,13 @@ yMSWav = '../proofOfConcept/audioExamples/membrane/kettledrum-ySAPFMemb2.wav';
 %resIRWav = '../proofOfConcept/resonatorIRs/45595__tim-kahn__futon-bd-1.aiff';
 %resIRWav = '../proofOfConcept/resonatorIRs/45596__tim-kahn__futon-bd-2.aiff';
 %resIRWav = '../proofOfConcept/resonatorIRs/snareShell.wav';
-resIRWav = '../proofOfConcept/resonatorIRs/taiko/taiko2.wav';
+%resIRWav = '../proofOfConcept/resonatorIRs/taiko/taiko2.wav';
 %resIRWav = '../proofOfConcept/resonatorIRs/beduk/beduk2.wav';
+resIRWav = '../proofOfConcept/resonatorIRs/marimbaTube.wav';
 
+% Room IRs
 %resIRWav = 'resonatorIRs/CarpenterCenter.wav';
-resIRWav = 'resonatorIRs/3000CStreetGarageStairwell.wav';
+%resIRWav = 'resonatorIRs/3000CStreetGarageStairwell.wav';
 
 % input percussion signal for comparison
 [yMS, ~] = audioread(yMSWav);

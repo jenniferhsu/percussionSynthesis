@@ -131,7 +131,7 @@ if plotSMCFigures==1
 %     title('feedback FM modal synthesis with pitch glide spectrogram, f1=2000Hz')
 %     set(gca,'FontSize',15)
     if saveSMCFigures==1
-        saveas(gcf, [saveDir 'basicMS'], 'eps')
+        saveas(gcf, [saveDir 'basicMS'], 'epsc')
     end
     
     % loopback FM rotation vs stretched APF with f_low=2000 (static)
@@ -145,7 +145,7 @@ if plotSMCFigures==1
     title('stretched APF MS spectrogram, f1=2000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
-        saveas(gcf, [saveDir 'rotationVsSAPF_f_low'], 'eps')
+        saveas(gcf, [saveDir 'rotationVsSAPF_f_low'], 'epsc')
     end
     
     % loopback FM rotation vs stretched APF with f_low=2000 (pitch glide)
@@ -159,7 +159,7 @@ if plotSMCFigures==1
     title('stretched APF MS with pitch glide spectrogram, f1=2000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
-        saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_low'], 'eps')
+        saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_low'], 'epsc')
     end
     
     % loopback FM rotation vs stretched APF with f_high=4000Hz (static)
@@ -173,7 +173,7 @@ if plotSMCFigures==1
     title('stretched APF MS spectrogram, f1=4000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
-        saveas(gcf, [saveDir 'rotationVsSAPF_f_high'], 'eps')
+        saveas(gcf, [saveDir 'rotationVsSAPF_f_high'], 'epsc')
     end
     
     % loopback FM rotation vs stretched APF with f_high=4000Hz (pitch glide)
@@ -187,7 +187,7 @@ if plotSMCFigures==1
     title('stretched APF MS with pitch glide spectrogram, f1=4000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
-        saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_high'], 'eps')
+        saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_high'], 'epsc')
     end
     
 end

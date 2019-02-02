@@ -7,7 +7,10 @@ function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 %   BVec: for pitch glides, this is a vector of B coefficient values
 %       if a pitch glide is not desired, this can be a single number
 %   env: amplitude envelope with length equal to the desired length for the
-%       output signal. 
+%       output signal.
+%       ** If this is a matrix, it should be of dimensions
+%       "length of fVec" by "desired output signal length" and each
+%       envelope will be used for a different frequency in fVec.
 %   fs: sampling rate in Hz
 % outputs:
 %   yFBFM: the output signal
@@ -26,11 +29,15 @@ function [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs)
 % [yFBFM, yFBFMMat] = feedbackFMSynthesis(fVec, BVec, env, fs);
 
 % make sure parameters are all set
-N = length(env);
 Nf = length(fVec);
+N = size(env, 2);
 T = 1/fs;
-nT = 0:T:((N/fs)-T);
 
+% set up the envelope matrix
+if size(env, 1)==1
+    % repeat env as a matrix
+    env = repmat(env, [Nf, 1]);
+end
 
 if length(BVec) == 1
     BVec = BVec * ones(1, N);
@@ -46,7 +53,7 @@ for i=1:Nf
     for n=2:N
         yFBFMMat(i,n) = exp(1j*wc*T*(1 + BVec(n-1) * real(yFBFMMat(i,n-1)))) * yFBFMMat(i,n-1);
     end
-    yFBFMMat(i,:) = yFBFMMat(i,:).*env;
+    yFBFMMat(i,:) = yFBFMMat(i,:) .* env(i,:);
 end
 yFBFM = sum(yFBFMMat, 1);
 

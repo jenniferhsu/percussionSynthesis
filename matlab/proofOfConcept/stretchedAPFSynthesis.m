@@ -10,6 +10,9 @@ function [ySAPF, ySAPFMat] = stretchedAPFSynthesis(fVec, b0, env, fs, fVecEnd, p
 %       equation
 %   env: amplitude envelope with length equal to the desired length for the
 %       output signal. 
+%       ** If this is a matrix, it should be of dimensions
+%       "length of fVec" by "desired output signal length" and each
+%       envelope will be used for a different frequency in fVec.
 %   fs: sampling rate in Hz
 %   fVecEnd: a vector of ending sounding frequencies in Hz with length
 %       matching fVec. this can be an empty vector if pitchGlideMode is set
@@ -43,10 +46,16 @@ function [ySAPF, ySAPFMat] = stretchedAPFSynthesis(fVec, b0, env, fs, fVecEnd, p
 SMC2019PLOT = 0;
 
 % make sure parameters are all set
-N = length(env);
 Nf = length(fVec);
+N = size(env, 2);
 T = 1/fs;
 nT = 0:T:((N/fs)-T);
+
+% set up the envelope matrix
+if size(env, 1)==1
+    % repeat env as a matrix
+    env = repmat(env, [Nf, 1]);
+end
 
 % synthesize feedback FM signal using the strecthed allpass filter
 ySAPFMat = zeros(Nf, N);
@@ -63,6 +72,7 @@ for i=1:Nf
         b0Vec = b0 * ones(1, N);
         Theta = w0.*nT;
     elseif strcmp(pitchGlideMode, 'linear')
+        
         m = (fVecEnd(i) - f)/(N/fs);
         b = f;
         %f0 = m*nT + b;
@@ -73,6 +83,8 @@ for i=1:Nf
         C = 0; 
         Theta = 2*pi*((m/2*nT.^2) + b*nT + C);
     elseif strcmp(pitchGlideMode, 'exp')
+        % this one works, but i haven't completely figured out what B is
+        % yet
         tau = 1/(log(fVecEnd(i)/f));
         %f0 = f*exp(nT./tau);
         %w0 = 2*pi*f0;
@@ -125,7 +137,7 @@ for i=1:Nf
 %     plot([w0/(2*pi) w0/(2*pi)], [0 max(abs(YFBFMPos))], 'k--');
 %     keyboard
 
-    ySAPFMat(i,:) = ySAPFMat(i,:).*env;
+    ySAPFMat(i,:) = ySAPFMat(i,:) .* env(i,:);
 end
 ySAPF = sum(ySAPFMat, 1);
 
@@ -152,15 +164,15 @@ if SMC2019PLOT==1
 
     % ENVELOPE
     figure
-    subplot(311); plot(real(env), 'linewidth', 2)
+    subplot(311); plot(real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
     set(gca,'XTick',[], 'YTick', [])
     
-    subplot(312); plot(real(env), 'linewidth', 2)
+    subplot(312); plot(real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
     set(gca,'XTick',[], 'YTick', [])
     
-    subplot(313); plot(real(env), 'linewidth', 2)
+    subplot(313); plot(real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
     set(gca,'XTick',[], 'YTick', [])
 
