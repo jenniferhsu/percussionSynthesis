@@ -166,14 +166,17 @@ if SMC2019PLOT==1
     figure
     subplot(311); plot(real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
+    ylim([0 1])
     set(gca,'XTick',[], 'YTick', [])
     
-    subplot(312); plot(real(env(1,:)), 'linewidth', 2)
+    subplot(312); plot(0.5*real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
+    ylim([0 1])
     set(gca,'XTick',[], 'YTick', [])
     
-    subplot(313); plot(real(env(1,:)), 'linewidth', 2)
+    subplot(313); plot(0.25*real(env(1,:)), 'linewidth', 2)
     set(gca,'linewidth', 3)
+    ylim([0 1])
     set(gca,'XTick',[], 'YTick', [])
 
     fig = gcf;
@@ -184,7 +187,7 @@ if SMC2019PLOT==1
     
     % ADDITIVE SYNTHESIS RESULT
     figure
-    plot(nT, ySAPF, 'linewidth', 2);
+    plot(nT, real(ySAPF), 'linewidth', 2);
     set(gca,'linewidth', 3)
     set(gca,'XTick',[], 'YTick', [])
     fig = gcf;

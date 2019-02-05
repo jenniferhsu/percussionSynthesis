@@ -36,7 +36,7 @@ addpath(genpath('../modalFrequencyEquations'));
 fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
-writeAudioFiles = 1;
+writeAudioFiles = 0;
 
 % mesh
 ex = 1;
@@ -65,7 +65,7 @@ TVAPFParams.f_b = fs/16;
 %% derived parameters
 N = fs*dur;
 T = 1/fs;
-env = g.^(linspace(0, N, N));   % exponential decay
+%env = g.^(linspace(0, N, N));   % exponential decay
 BVec = g.^(0:N-1)';             % feedback FM pitch glide coefficient
 
 
@@ -105,10 +105,29 @@ end
 
 % mesh modal frequencies
 fVecMesh = faxis(locs);
+Nf = length(fVecMesh);
 
 % center frequencies for feedback FM if sounding frequencies = mesh modal
 % frequencies
 fcVecMesh = fVecMesh./(sqrt(1-B^2));
+
+%% set up decay envelopes
+% want the lowest modal frequencies to have a larger starting amplitude 
+% than the highest modal frequencies
+aStart = zeros(1, Nf);
+aStart(1) = 1;              % highest amplitude for lowest modal freq
+aStart(Nf) = 0.01;          % lowest amplitude for highest modal freq
+tau = -(Nf-1) / log(aStart(Nf));
+a0 = 1/exp(-1/tau);
+aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
+                                            % starting amplitudes
+
+e = g.^(linspace(0, N, N));   % exponential decay
+
+env = zeros(Nf, N);
+for i=1:Nf
+    env(i,:) = aStart(i) * e;
+end
 
 
 %% FEEDBACK FM vs. MESH
@@ -265,6 +284,24 @@ if plotSpectrograms == 1
     figure
     spectrogram(real(yMS), hann(256), 128, 1024, fs, 'yaxis');
     title('modal synthesis spectrogram')
+end
+
+%% set up decay envelopes
+% want the lowest modal frequencies to have a larger starting amplitude 
+% than the highest modal frequencies
+aStart = zeros(1, Nf);
+aStart(1) = 1;              % highest amplitude for lowest modal freq
+aStart(Nf) = 0.01;          % lowest amplitude for highest modal freq
+tau = -(Nf-1) / log(aStart(Nf));
+a0 = 1/exp(-1/tau);
+aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
+                                            % starting amplitudes
+
+e = g.^(linspace(0, N, N));   % exponential decay
+
+env = zeros(Nf, N);
+for i=1:Nf
+    env(i,:) = aStart(i) * e;
 end
 
 

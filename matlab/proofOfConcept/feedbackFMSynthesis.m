@@ -44,7 +44,7 @@ if length(BVec) == 1
 end
 
 % synthesize feedback FM signal
-yFBFMMat = zeros(Nf, N);
+yFBFMMat = zeros(Nf, N); 
 yFBFMMat(:,1) = 1;
 
 for i=1:Nf

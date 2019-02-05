@@ -109,6 +109,12 @@ BVec2 = linspace(0.5, 0.7, N);
 fcVecBar2 = fVecBar./(sqrt(1-BVec2(1)^2));
 [yFBFMMemb3, yFBFMMembMat3] = feedbackFMSynthesis(fcVecBar2, BVec2, env, fs);
 
+% EXAMPLE 4:
+% for plotting purposes
+BVec3 = linspace(0.7, 0.25, N);
+fcVecBar3 = fVecBar./(sqrt(1-BVec3(1)^2));
+fcVecBar3 = fVecBar./(sqrt(1-BVec3(1)^2));
+[yFBFMMemb4, yFBFMMembMat4] = feedbackFMSynthesis(fcVecBar3, BVec3, env, fs);
 % this is the pitch glide function
 %w0 = (2*pi*fVecBar(1))*sqrt(1 - linspace(0.9, 0.91, N).^2);
 %plot(w0/(2*pi));
@@ -138,6 +144,7 @@ if writeAudioFiles == 1
     audiowrite([outDir 'yFBFMMemb1.wav'], scaleForSavingAudio(real(yFBFMMemb1)), fs);
     audiowrite([outDir 'yFBFMMemb2.wav'], scaleForSavingAudio(real(yFBFMMemb2)), fs);
     audiowrite([outDir 'yFBFMMemb3.wav'], scaleForSavingAudio(real(yFBFMMemb3)), fs);
+    audiowrite([outDir 'yFBFMMemb4.wav'], scaleForSavingAudio(real(yFBFMMemb4)), fs);
     
     audiowrite([outDir 'ySAPFMemb1.wav'], scaleForSavingAudio(real(ySAPFMemb1)), fs);
     audiowrite([outDir 'ySAPFMemb2.wav'], scaleForSavingAudio(real(ySAPFMemb2)), fs);

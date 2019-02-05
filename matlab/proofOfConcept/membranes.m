@@ -98,7 +98,11 @@ end
 % EXAMPLE 3: feedback FM with pitch glide with center frequencies = membrane
 % modal frequencies (YES)
 % cool for bass drum, kettledrum
-[yFBFMMemb3, yFBFMMembMat3] = feedbackFMSynthesis(fVecMembrane, BVec, env, fs);
+if strcmp(outDir, 'audioExamples/membrane/o-daiko/')
+    [yFBFMMemb3, yFBFMMembMat3] = feedbackFMSynthesis(fcVecMembrane, BVec, env, fs);
+else
+    [yFBFMMemb3, yFBFMMembMat3] = feedbackFMSynthesis(fVecMembrane, BVec, env, fs);
+end
 
 % EXAMPLE 4: feedback FM with pitch glide with sounding frequencies = membrane
 % modal frequencies
@@ -135,8 +139,8 @@ end
 % frequencies (YES)
 fVecMembrane_w0End = fcVecMembrane .* sqrt(1 - BVecLin(end).^2);
 fVecMembrane_w0EndK = fVecMembrane_w0 .* sqrt(1 - BVecLin(end).^2);
-if strcmp(outDir, 'audioExamples/membrane/o-daiko/')==1 || ...
-        strcmp(outDir, 'audioExamples/membrane/snare/')==1 
+%if strcmp(outDir, 'audioExamples/membrane/o-daiko/')==1 || ...
+if strcmp(outDir, 'audioExamples/membrane/snare/')==1 
     [ySAPFMemb4, ySAPFMembMat4] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0EndK, 'linear');
 else
     [ySAPFMemb4, ySAPFMembMat4] = stretchedAPFSynthesis(fVecMembrane, b0, env, fs, fVecMembrane_w0End, 'linear');

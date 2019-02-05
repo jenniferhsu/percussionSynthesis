@@ -40,7 +40,7 @@ figure
 plot(faxis, H_FMPosdB, 'linewidth', 2)
 xlabel('Frequency (Hz)');
 ylabel('Amplitude (dB)');
-title('Loopback FM magnitude spectrum for \omega _0 = 2\pi300'); 
+title('Loopback FM magnitude spectrum for f_0 = 300Hz'); 
 set(gca, 'FontSize', 15);
 ylim([-60 0]);
 grid on
@@ -185,11 +185,11 @@ ylim([0 2])
 title(sprintf('Feedback FM with B=%f and f0=%f', B, w0/(2*pi)));
 legend('w_0')
 
-subplot(313)
-spectrogram(h_pm, hann(1024), 512, 1024, fs, 'yaxis')
-hold on
-plot(linspace(0, 1000, N), w0/(2*pi*1000) * ones(1, N), 'r') 
-ylim([0 2])
-title(sprintf('Feedback PM B=%f and f0=%f', B, w0/(2*pi)));
-legend('w_0')
+% subplot(313)
+% spectrogram(h_pm, hann(1024), 512, 1024, fs, 'yaxis')
+% hold on
+% plot(linspace(0, 1000, N), w0/(2*pi*1000) * ones(1, N), 'r') 
+% ylim([0 2])
+% title(sprintf('Feedback PM B=%f and f0=%f', B, w0/(2*pi)));
+% legend('w_0')
 
