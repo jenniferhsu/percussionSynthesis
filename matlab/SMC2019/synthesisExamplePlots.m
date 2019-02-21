@@ -8,10 +8,10 @@ addpath(genpath('../proofOfConcept'));
 fs = 44100;
 N = 2*fs;
 
-%synthExample = 'marimba';
-%synthExample = 'tom tom';
+synthExample = 'marimba';
+synthExample = 'tom tom';
 %synthExample = 'circular plate';
-synthExample = 'wood block';
+%synthExample = 'wood block';
 
 % Marimba example
 if strcmp('marimba', synthExample) == 1
@@ -134,7 +134,7 @@ end
 figure
 subplot(211)
 spectrogram(yMS_RC, hann(256), 128, 1024, fs, 'yaxis');
-title(sprintf('modal synthesis of %s with raised cosine excitation', synthExample));
+title(sprintf('MS of %s with raised cosine excitation', synthExample));
 set(gca, 'FontSize', 15);
 if strcmp('tom tom', synthExample)
     ylim([0 5]) 
@@ -146,7 +146,7 @@ if strcmp('wood block', synthExample)
 end
 subplot(212)
 spectrogram(yLBFM_RC, hann(256), 128, 1024, fs, 'yaxis');
-title(sprintf('LBFM modal synthesis of %s with raised cosine excitation', synthExample));
+title(sprintf('Loopback FM MS of %s with raised cosine excitation', synthExample));
 set(gca, 'FontSize', 15);
 if strcmp('tom tom', synthExample)
     ylim([0 5]) 
@@ -163,7 +163,7 @@ saveas(gcf, [saveDir synthExample '_raisedCosine'], 'epsc')
 figure
 subplot(211)
 spectrogram(yMS_NB, hann(256), 128, 1024, fs, 'yaxis');
-title(sprintf('modal synthesis of %s with filtered noise burst', synthExample));
+title(sprintf('MS of %s with filtered noise burst', synthExample));
 set(gca, 'FontSize', 15);
 if strcmp('tom tom', synthExample)
     ylim([0 5]) 
@@ -175,7 +175,7 @@ if strcmp('wood block', synthExample)
 end
 subplot(212)
 spectrogram(yLBFM_NB, hann(256), 128, 1024, fs, 'yaxis');
-title(sprintf('LBFM modal synthesis of %s with filtered noise burst', synthExample));
+title(sprintf('Loopback FM MS of %s with filtered noise burst', synthExample));
 set(gca, 'FontSize', 15);
 if strcmp('tom tom', synthExample)
     ylim([0 5])

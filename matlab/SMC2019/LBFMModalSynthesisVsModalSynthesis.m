@@ -13,7 +13,7 @@ fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
 plotSMCFigures = 1;
-saveSMCFigures = 1;
+saveSMCFigures = 0;
 
 saveDir = 'figures/';
 if ~exist(saveDir, 'dir')
@@ -113,6 +113,22 @@ b0 = (sqrt(1-B^2) - 1)/B;
 % stretched APF with pitch glide, w0 = modal frequencies
 [ySAPFModal_high2, ~] = stretchedAPFSynthesis(fVecModal_high, b0, env, fs, fcVecModal_high, 'fbfm');
 
+
+%% Musical Parameters - Sounding Frequency Diagram
+% this figure compares how the spectrogram changes if we set the sounding
+% frequencies to the modal frequencies vs. if we set the carrier frequencies
+% to the modal frequencies
+
+f_high2 = 5000;
+fVecModal_high2 = modes*f_high2;
+fcVecModal_high2 = fVecModal_high2./(sqrt(1-B^2));
+
+[yFBFM_fcIsModal, ~] = feedbackFMSynthesis(fVecModal_high2, B, env, fs);
+
+% feedback FM with pitch glide with sounding frequencies = modal frequencies
+[yFBFM_f0IsModal, ~] = feedbackFMSynthesis(fcVecModal_high2, B, env, fs);
+
+
 %% Figures for SMC
 
 if plotSMCFigures==1
@@ -123,6 +139,7 @@ if plotSMCFigures==1
     spectrogram(real(yMS_low), hann(256), 128, 1024, fs, 'yaxis');
     title('Traditional modal synthesis spectrogram, f_c=2000Hz')
     set(gca,'FontSize',15)
+    ylim([0 6]);
 %     subplot(312)
 %     spectrogram(real(yFBFMModal_low1), hann(256), 128, 1024, fs, 'yaxis');
 %     title('feedback FM modal synthesis spectrogram, f_c=2000Hz')
@@ -134,7 +151,7 @@ if plotSMCFigures==1
     if saveSMCFigures==1
         fig = gcf;
         fig.PaperUnits = 'inches';
-        fig.PaperPosition = [0 0 6 3];
+        fig.PaperPosition = [0 0 6 2.5];
         saveas(gcf, [saveDir 'traditionalMS'], 'epsc')
     end
     
@@ -194,4 +211,23 @@ if plotSMCFigures==1
         saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_high'], 'epsc')
     end
     
+    % sounding frequency (carrier or sounding frequencies set to equal
+    % modal frequencies)
+    figure
+    subplot(211)
+    spectrogram(real(yFBFM_fcIsModal), hann(256), 128, 1024, fs, 'yaxis');
+    title('Loopback FM modal synthesis with f_c = f(i)')
+    set(gca,'FontSize',15)
+    subplot(212)
+    spectrogram(real(yFBFM_f0IsModal), hann(256), 128, 1024, fs, 'yaxis');
+    title('Loopback FM modal synthesis with f_0 = f(i)')
+    set(gca,'FontSize',15)
+    if saveSMCFigures==1
+        saveas(gcf, [saveDir '?carrierOrSoundingAsModalFreq'], 'epsc')
+    end
+    
 end
+
+
+
+    

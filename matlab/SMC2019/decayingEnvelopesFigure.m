@@ -67,6 +67,6 @@ title('Decaying exponential amplitude envelopes');
 set(gca, 'FontSize', 15)
 fig = gcf;
 fig.PaperUnits = 'inches';
-fig.PaperPosition = [0 0 6 3];
+fig.PaperPosition = [0 0 6 2.2];
 grid on
 saveas(fig, 'figures/amplitudeEnvelopes', 'epsc')

@@ -10,8 +10,8 @@ addpath(genpath('../proofOfConcept'));
 fs = 44100;
 N = 2*fs;
 
-synthExample = 'marimba';
-%synthExample = 'tom tom';
+%synthExample = 'marimba';
+synthExample = 'tom tom';
 %synthExample = 'circular plate';
 %synthExample = 'bass drum';
 %synthExample = 'kettledrum';

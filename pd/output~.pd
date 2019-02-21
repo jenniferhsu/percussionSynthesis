@@ -1,0 +1,23 @@
+#N canvas 0 22 534 470 10;
+#X obj 288 267 dac~;
+#X obj 284 212 *~;
+#X obj 284 174 line~;
+#X msg 284 143 \$1 100;
+#X msg 239 114 0;
+#X obj 110 123 hsl 80 15 0 1 0 0 slideVal slideVal empty -2 -8 0 10
+-262144 -1 -1 0 1;
+#X obj 284 103 r slideVal;
+#X text 51 324 simple output~ patch with smoothly changing level slider
+;
+#X text 51 341 author: Jennifer Hsu;
+#X text 52 356 date: fall 2018;
+#X obj 383 90 inlet~;
+#X text 383 110 input signal;
+#X connect 1 0 0 0;
+#X connect 1 0 0 1;
+#X connect 2 0 1 0;
+#X connect 3 0 2 0;
+#X connect 4 0 2 0;
+#X connect 6 0 3 0;
+#X connect 10 0 1 1;
+#X coords 0 -1 1 1 100 50 1 100 100;

@@ -44,7 +44,10 @@ title('Loopback FM magnitude spectrum for f_0 = 300Hz');
 set(gca, 'FontSize', 15);
 ylim([-60 0]);
 grid on
-saveas(gcf, 'figures/LBFMMagSpec', 'epsc')
+fig = gcf
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 2.5];
+print('figures/LBFMMagSpec', '-depsc', '-r0')
 
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%

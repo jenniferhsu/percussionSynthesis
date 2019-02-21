@@ -69,7 +69,14 @@ for i=1:Nf
     % pitch glide modes
     if strcmp(pitchGlideMode, 'none')
         w0 = 2*pi*f*ones(1, N);
-        b0Vec = b0 * ones(1, N);
+        if length(b0) < N
+            b0Vec = b0 * ones(1, N);
+        else 
+            b0Vec = b0';
+            if size(b0Vec, 1) ~= 1
+                b0Vec = b0Vec';
+            end
+        end
         Theta = w0.*nT;
     elseif strcmp(pitchGlideMode, 'linear')
         
@@ -85,14 +92,24 @@ for i=1:Nf
     elseif strcmp(pitchGlideMode, 'exp')
         % this one works, but i haven't completely figured out what B is
         % yet
-        tau = 1/(log(fVecEnd(i)/f));
-        %f0 = f*exp(nT./tau);
-        %w0 = 2*pi*f0;
+%         tau = 1/(log(fVecEnd(i)/f));
+%         %f0 = f*exp(nT./tau);
+%         %w0 = 2*pi*f0;
+%         
+%         b0Vec = b0 * ones(1, N);
+%         
+%         C = 0;                      
+%         Theta = 2*pi*f*tau.*exp(nT./tau) + C;
         
-        b0Vec = b0 * ones(1, N);
+        g = 0.9999;
+        B = g.^(0:N-1)';
+        u = sqrt(1 - B.^2);
         
-        C = 0;                      
-        Theta = 2*pi*f*tau.*exp(nT./tau) + C;
+        b0Vec = b0 * ones(N,1);%(sqrt(1 - B.^2) - 1)./B;
+        
+        C = 0;                      % constant of integration
+        Theta = (2*pi*fVecEnd(i)*T/log(g)) .* (u - atanh(u) + C);
+        
     elseif strcmp(pitchGlideMode, 'fbfm')
         % fVec is ignored here and the starting freq is 0Hz
         % g can range from 0.9997 to 0.9999999, but it starts to break

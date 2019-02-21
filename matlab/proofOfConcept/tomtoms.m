@@ -123,10 +123,12 @@ fVecMembrane_w0 = fVecMembrane*sqrt(1 - B^2);
 
 % EXAMPLE 3: pitch glide from FBFM Example 2 - this is really well done
 fVecMembrane_w0End = fVecMembrane .* sqrt(1 - BVec(end).^2);
-[ySAPFMemb3, ySAPFMembMat3] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0End, 'linear');
+%[ySAPFMemb3, ySAPFMembMat3] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0End, 'linear');
+[ySAPFMemb3, ySAPFMembMat3] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0End, 'exp');
 
 % EXAMPLE 4: for plotting only
-[ySAPFMemb4, ySAPFMembMat4] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0/2, 'linear');
+%[ySAPFMemb4, ySAPFMembMat4] = stretchedAPFSynthesis(fVecMembrane_w0, b0, env, fs, fVecMembrane_w0/2, 'linear');
+[ySAPFMemb4, ySAPFMembMat4] = stretchedAPFSynthesis(fVecMembrane_w0, -0.9, env, fs, fVecMembrane_w0/2, 'exp');
 
 
 

@@ -44,7 +44,7 @@ subplot(212)
 plot(e_nb, 'linewidth', 2);
 xlabel('Time (samples)');
 ylabel('Amplitude (linear)');
-title('Filtered noise burst excitation, \tau _d = 0.01 sec, fc_{low} = 200, fc_{high} = 2000');
+title('Filtered noise burst excitation, \tau _d = 0.01 sec, f_{low} = 200, f_{high} = 2000');
 xlim([0 2048]);
 ylim([-0.8 0.8]);
 grid on
