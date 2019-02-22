@@ -14,7 +14,7 @@ static t_class *feedbackFM_class;
 typedef struct _feedbackFM
 {
     t_object x_obj; 	/* obligatory header */
-    t_float x_f;    	/* place to hold inlet's value if it's set by message */
+    t_float x_fc;    	/* carrier frequency */
     t_float x_B;        /* feedback FM coefficient */
     t_float x_sr;       /* sample rate */
     t_float x_T;        /* sample period (1/sr) */
@@ -68,7 +68,7 @@ static t_int *feedbackFM_perform(t_int *w)
         */
 
         // feedback FM
-        theta = 2.0f * M_PI * x->x_f * x->x_T * (1.0f + (x->x_B * x->x_reMinus1));
+        theta = 2.0f * M_PI * x->x_fc * x->x_T * (1.0f + (x->x_B * x->x_reMinus1));
         c = cos(theta);
         s = sin(theta);
 
@@ -108,6 +108,7 @@ void feedbackFM_setB(t_feedbackFM *x, t_floatarg f)
     x->x_B = f;
 }
 
+
 static void *feedbackFM_new(void)
 {
     t_feedbackFM *x = (t_feedbackFM *)pd_new(feedbackFM_class);
@@ -116,15 +117,10 @@ static void *feedbackFM_new(void)
     // create outlet for outgoing audio signal
     outlet_new(&x->x_obj, gensym("signal"));
 
-    //x->x_f = 0;
-    // these will be inlets so the user can set them
-    x->x_f = 698.0f;
+    x->x_fc = 698.0f;
     x->x_B = 0.9f;
-    
-    // next step: set input to be an impulse to set it off
 
     // initialize internal variables
-    //x->x_reMinus1 = 1.0f;
     x->x_reMinus1 = 0.0f;
     x->x_imMinus1 = 0.0f;
 
@@ -140,11 +136,12 @@ void feedbackFM_tilde_setup(void)
     	sizeof(t_feedbackFM), 0, A_DEFFLOAT, 0);
 	    /* this is magic to declare that the leftmost, "main" inlet
 	    takes signals; other signal inlets are done differently... */
-    CLASS_MAINSIGNALIN(feedbackFM_class, t_feedbackFM, x_f);
+    CLASS_MAINSIGNALIN(feedbackFM_class, t_feedbackFM, x_fc);
     	/* here we tell Pd about the "dsp" method, which is called back
 	when DSP is turned on. */
     class_addmethod(feedbackFM_class, (t_method)feedbackFM_dsp, gensym("dsp"), 0);
     
     // register callback method for right inlet float
     class_addmethod(feedbackFM_class, (t_method)feedbackFM_setB, gensym("B"), A_FLOAT, 0);
+
 }
