@@ -16,8 +16,8 @@ function [yTVAPF, yTVAPFMat, TVAPFParamsUsed] = TVAPFSynthesis(fVec, env, TVAPFP
 %   fs: sampling rate in Hz
 % outputs:
 %   yTVAPF: the output signal
-%   yTVAPFMat: the feedback FM signal synthesized for each frequency in fVec
-%       in matrix form. yFBFMMat(x,:) is the feedback FM signal created for
+%   yTVAPFMat: the TV APF sinusoid signal synthesized for each frequency in fVec
+%       in matrix form. yTVAPFMat(x,:) is the feedback FM signal created for
 %       center frequency fVec(x)
 %   TVAPFParamsUsed: time-varying allpass filter parameters that were
 %       actually used for synthesis. this may differ from the input

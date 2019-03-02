@@ -113,8 +113,8 @@ fVecWB_w0 = fVecWB*sqrt(1 - B^2);
 % EXAMPLE 2: feedback FM with FBFM pitch glide with wc = membrane modal
 % frequencies 
 %[ySAPFWB2, ySAPFWBMat2] = stretchedAPFSynthesis(fVecWB_w0, b0, envWood, fs, 2*fVecWB_w0, 'linear');
-%[ySAPFWB2, ySAPFWBMat2] = stretchedAPFSynthesis(fVecWB, b0, envWood, fs, 2*fVecWB, 'linear');
-[ySAPFWB2, ySAPFWBMat2] = stretchedAPFSynthesis(fVecWB, b0, envWood, fs, 4*fVecWB, 'exp');
+[ySAPFWB2, ySAPFWBMat2] = stretchedAPFSynthesis(fVecWB, b0, envWood, fs, 2*fVecWB, 'linear');
+%[ySAPFWB2, ySAPFWBMat2] = stretchedAPFSynthesis(fVecWB, b0, envWood, fs, 4*fVecWB, 'exp');
 
 % EXAMPLE 3: feedback FM with pitch glide with w0 = membrane modal
 % frequencies (YES)

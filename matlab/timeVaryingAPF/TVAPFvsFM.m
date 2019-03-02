@@ -1,3 +1,5 @@
+addpath(genpath('../proofOfConcept/'))
+
 fs = 44100;
 dur = 1;
 
