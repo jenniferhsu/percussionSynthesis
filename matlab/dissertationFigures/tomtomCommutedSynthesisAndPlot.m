@@ -1,8 +1,8 @@
-% woodBlockCommutedSynthesisAndPlot.m
+% tomtomCommutedSynthesisAndPlot.m
 %
-% woodBlockSynthesisExample.m should be called to save the wood block
+% tomtomSynthesisExample.m should be called to save the tom tom
 % resonator files. This file plots and performs commuted synthesis for the 
-% wood block resonator created using:
+% tom tom resonator (taiko) created using:
 %
 %   a. modal synthesis
 %   b. the time-varying allpass filtering for sinusoids used in 
@@ -10,9 +10,9 @@
 %   c. loopback FM modal synthesis
 %   d. time-varying allpass filtering on loopback FM oscillators
 %
-% The excitation is a 0.001 second long noise burst bandpass filtered from
-% 120Hz to 12000Hz.  The acoustic resonator IR is a recording of a guitar
-% body being hit retrieved from freesound.org.
+% The excitation is a 0.05 second long noise burst bandpass filtered from
+% 120Hz to 4000Hz.  The acoustic resonator IR is a taiko being hit and
+% retrieved from freesound.org.
 
 addpath(genpath('../proofOfConcept'));
 
@@ -20,7 +20,7 @@ addpath(genpath('../proofOfConcept'));
 %% input parameters
 
 fs = 44100;
-dur = 0.5;
+dur = 2;
 N = dur*fs;
 savePlots = 1;
 writeAudioFiles = 1;
@@ -30,16 +30,16 @@ if ~exist(plotSaveDir, 'dir')
     mkdir(plotSaveDir);
 end
 
-audioSaveDir = 'audioExamples/woodBlock/commutedSynth/';
+audioSaveDir = 'audioExamples/tomtom/commutedSynth/';
 if ~exist(audioSaveDir, 'dir')
     mkdir(audioSaveDir);
 end
 
-yMSWav = 'audioExamples/woodBlock/modalSynthesis.wav';
-yTVAPFMSWav = 'audioExamples/woodBlock/TVAPFModalSynthesis.wav';
-yLBWav = 'audioExamples/woodBlock/loopbackFM.wav';
-yTVAPFLBWav = 'audioExamples/woodBlock/TVAPFLoopbackFM.wav';
-resIRWav = '../proofOfConcept/resonatorIRs/113620__vidsyn__miscsoftnaturalgtrloud2-2.wav';
+yMSWav = 'audioExamples/tomtom/modalSynthesis.wav';
+yTVAPFMSWav = 'audioExamples/tomtom/TVAPFModalSynthesis.wav';
+yLBWav = 'audioExamples/tomtom/loopbackFM.wav';
+yTVAPFLBWav = 'audioExamples/tomtom/TVAPFLoopbackFM.wav';
+resIRWav = '../proofOfConcept/resonatorIRs/taiko/taiko2cut.wav';
 
 %% read in audio files
 
@@ -53,9 +53,9 @@ resIRWav = '../proofOfConcept/resonatorIRs/113620__vidsyn__miscsoftnaturalgtrlou
 %%  generate noise burst excitation
 
 % parameters
-durNB = .001;
+durNB = 0.05;
 lowFreq = 120;
-highFreq = 12000;
+highFreq = 4000;
 
 % noise burst
 sampNB = ceil(durNB*fs);
@@ -102,30 +102,34 @@ end
 
 if savePlots == 1
     
-    synthExample = 'Wood block';
+    synthExample = 'Tom tom';
 
     figure
     subplot(221)
     spectrogram(yMS_NB, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('MS', synthExample));
+    ylim([0 5]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(222)
     spectrogram(yLB_NB, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Loopback FM MS', synthExample));
+    ylim([0 5]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(223)
     spectrogram(yTVAPFMS_NB, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Time-varying APF MS', synthExample));
+    ylim([0 5]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(224)
     spectrogram(yTVAPFLB_NB, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Time-varying APF of Loopback FM MS', synthExample));
+    ylim([0 5]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 

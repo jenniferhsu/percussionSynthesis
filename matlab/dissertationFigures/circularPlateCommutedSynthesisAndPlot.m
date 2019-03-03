@@ -1,8 +1,8 @@
-% marimbaCommutedSynthesisAndPlot.m
+% circularPlateCommutedSynthesisAndPlot.m
 %
-% marimbaSynthesisExample.m should be called to save the marimba resonator
-% files. This file plots and performs commuted synthesis for the marimba 
-% resonator created using:
+% circularPlateSynthesisExample.m should be called to save the circular 
+% plate resonator files. This file plots and performs commuted synthesis 
+% for the circular plate resonator (room IR) created using:
 %
 %   a. modal synthesis
 %   b. the time-varying allpass filtering for sinusoids used in 
@@ -10,9 +10,8 @@
 %   c. loopback FM modal synthesis
 %   d. time-varying allpass filtering on loopback FM oscillators
 %
-% The excitation is an 8-sample long raised cosine excitation and the
-% acoustic resonator IR is an acoustic tube created using traditional modal
-% synthesis.
+% The excitation is an 8-sample long raised cosine.  The acoustic 
+% resonator IR is a room impulse response retrieved from EchoThief.com.
 
 addpath(genpath('../proofOfConcept'));
 
@@ -20,7 +19,8 @@ addpath(genpath('../proofOfConcept'));
 %% input parameters
 
 fs = 44100;
-N = 2*fs;
+dur = 2;
+N = dur*fs;
 savePlots = 1;
 writeAudioFiles = 1;
 
@@ -29,16 +29,16 @@ if ~exist(plotSaveDir, 'dir')
     mkdir(plotSaveDir);
 end
 
-audioSaveDir = 'audioExamples/marimba/commutedSynth/';
+audioSaveDir = 'audioExamples/circularPlate/commutedSynth/';
 if ~exist(audioSaveDir, 'dir')
     mkdir(audioSaveDir);
 end
 
-yMSWav = 'audioExamples/marimba/modalSynthesis.wav';
-yTVAPFMSWav = 'audioExamples/marimba/TVAPFModalSynthesis.wav';
-yLBWav = 'audioExamples/marimba/loopbackFM.wav';
-yTVAPFLBWav = 'audioExamples/marimba/TVAPFLoopbackFM.wav';
-resIRWav = '../proofOfConcept/resonatorIRs/marimbaTube.wav';
+yMSWav = 'audioExamples/circularPlate/modalSynthesis.wav';
+yTVAPFMSWav = 'audioExamples/circularPlate/TVAPFModalSynthesis.wav';
+yLBWav = 'audioExamples/circularPlate/loopbackFM.wav';
+yTVAPFLBWav = 'audioExamples/circularPlate/TVAPFLoopbackFM.wav';
+resIRWav = 'resonatorIRs/CarpenterCenter.wav';
 
 %% read in audio files
 
@@ -98,34 +98,34 @@ end
 
 if savePlots == 1
     
-    synthExample = 'Marimba';
+    synthExample = 'Circular plate';
 
     figure
     subplot(221)
     spectrogram(yMS_RC, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('MS', synthExample));
-    ylim([0 18])
+    ylim([0 18]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(222)
     spectrogram(yLB_RC, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Loopback FM MS', synthExample));
-    ylim([0 18])
+    ylim([0 18]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(223)
     spectrogram(yTVAPFMS_RC, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Time-varying APF MS', synthExample));
-    ylim([0 18])
+    ylim([0 18]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
     subplot(224)
     spectrogram(yTVAPFLB_RC, hann(256), 128, 1024, fs, 'yaxis');
     title(sprintf('Time-varying APF of Loopback FM MS', synthExample));
-    ylim([0 18])
+    ylim([0 18]) 
     colorbar('off');
     set(gca, 'FontSize', 15);
 
