@@ -134,12 +134,20 @@ MNL2 = MNL2/max(max(MNL2));
 envNL1 = zeros(NfNL, N);
 xx = linspace(0, size(MNL2, 2)-1, size(MNL2, 2));
 
+tau = -(N-1)/log(0.1);
+ee = 1 * exp(-n/tau);
+
+
 for i=1:NfNL
     mEnv = MNL2(i,:);
+
     p = polyfit(xx,mEnv,3);
     f = polyval(p,xx);
     
     envNL1(i,:) = resample(f, 44100, length(mEnv));
+    if i > 1
+        envNL1(i,:) = envNL1(i,:) .* ee; % need to get it to decrease
+    end
     %envNL1(i,:) = envelope(envNL1(i,:), 4096, 'rms');
     %envNL1(i,:) = envelope(envNL1(i,:), 4096);
 
@@ -317,6 +325,11 @@ for f=1:NfNL
     yLBFM3 = yLBFM3 + yLBFM3Mat(f,:) .* envNL1(f,:);
 end
 
+figure
+subplot(211)
+spectrogram(yNL, hann(256), 128, 1024, fs, 'yaxis');
+subplot(212)
+spectrogram(real(yLBFM3), hann(256), 128, 1024, fs, 'yaxis');
 
 %% Time-varying allpass filter tests
 TVAPFParams.M = 100;
@@ -342,10 +355,10 @@ end
 
 % filter parameters from:
 % https://www.cim.mcgill.ca/~clark/nordmodularbook/nm_percussion.html
-[B,A] = butter(3, [523 7000]/(fs/2));
+[Bfilt,Afilt] = butter(3, [523 7000]/(fs/2));
 
 wn = 2*rand(1, N) - 1;
-fwn = filter(B, A, wn);
+fwn = filter(Bfilt, Afilt, wn);
 
 yMSN = yMS + fwn .* env(1,:);
 yLBFMN1 = yLBFM1 + fwn .* env(1,:);

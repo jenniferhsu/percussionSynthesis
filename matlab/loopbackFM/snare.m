@@ -177,19 +177,43 @@ yLBFMN3 = yLBFM3 + fwn .* env(1,:);
 
 % YES, THEY SOUND PRETTY GOOD.
 
+%% write audio to file
+
+audiowrite('audioExamples/snareMS.wav', scaleForSavingAudio(real(yMSN)), fs);
+audiowrite('audioExamples/snareLoopbackFMMS.wav', scaleForSavingAudio(real(yLBFMN2)), fs);
 
 %% plots
 figure
 spectrogram(real(yMSN), hann(256), 128, 1024, fs, 'yaxis');
-ylim([0 10])
+ylim([0 2])
+title('snare modal synthesis (with filtered noise)');
+colorbar('off')
+fig = gcf
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 1.6];
+print(['figures/snareMS'], '-depsc', '-r0')
 
 figure
+spectrogram(real(yLBFMN2), hann(256), 128, 1024, fs, 'yaxis');
+ylim([0 2])
+title('snare loopback FM MS (with filtered noise)');
+colorbar('off')
+fig = gcf
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 1.6];
+print(['figures/snareLoopbackFMMS'], '-depsc', '-r0')
+
+
+figure
+
 subplot(311)
 spectrogram(real(yLBFMN1), hann(256), 128, 1024, fs, 'yaxis');
 ylim([0 10])
+
 subplot(312)
 spectrogram(real(yLBFMN2), hann(256), 128, 1024, fs, 'yaxis');
 ylim([0 10])
+
 subplot(313)
 spectrogram(real(yLBFMN3), hann(256), 128, 1024, fs, 'yaxis');
 ylim([0 10])
