@@ -149,7 +149,8 @@ BTildeNL = sqrt(1 - (w0VecNLTilde./wcVecNL).^2);
 yLBFM3 = zeros(1, N);
 yLBFM3Mat = zeros(NfNL, N);
 yLBFM3Mat(:,1) = 1;
-for f=1:NfNL
+%for f=1:NfNL
+for f=1:(NfNL-60)
     for i=2:N
         yLBFM3Mat(f,i) = exp(j*wcVecNL(f)*T*(1 + BTildeNL(f,i) * real(yLBFM3Mat(f,i-1)))) * yLBFM3Mat(f,i-1);
     end
@@ -165,7 +166,7 @@ spectrogram(real(yLBFM3), hann(256), 128, 1024, fs, 'yaxis');
 
 %% None of the linear modal frequencies are in the nonlinear modal 
 % frequencies list. Maybe in the linear case, wc = w0 and B = 0 and in the
-% nonlinear case, wc is fVec, w0 is w0Vec, and B is BVec.
+% nonlinear case, wc is fVec (linear), w0 is w0Vec, and B is BVec.
 
 wcVec = 2*pi*fVec;
 w0Vec = zeros(1, Nf);
@@ -188,13 +189,15 @@ end
 BVecStart = sqrt(1 - (w0Vec./wcVec).^2); 
 
 %% Can we synthesize this sce-nare-nare?
+
 % envelope from nonlinear model, no pitch glide
 yLBFM4 = zeros(1, N);
 yLBFM4Mat = zeros(Nf, N);
 yLBFM4Mat(:,1) = 1;
 for f=1:Nf
     for i=2:N
-        yLBFM4Mat(f,i) = exp(j*wcVecNL(f)*T*(1 + BVecStart(f) * real(yLBFM4Mat(f,i-1)))) * yLBFM4Mat(f,i-1);
+        %yLBFM4Mat(f,i) = exp(j*wcVecNL(f)*T*(1 + BVecStart(f) * real(yLBFM4Mat(f,i-1)))) * yLBFM4Mat(f,i-1);
+        yLBFM4Mat(f,i) = exp(j*wcVec(f)*T*(1 + BVecStart(f) * real(yLBFM4Mat(f,i-1)))) * yLBFM4Mat(f,i-1);
     end
     yLBFM4 = yLBFM4 + yLBFM4Mat(f,:) .* envNL1(NLInds(f),:);
 end
@@ -205,6 +208,37 @@ spectrogram(yNL, hann(256), 128, 1024, fs, 'yaxis');
 subplot(212)
 spectrogram(real(yLBFM4), hann(256), 128, 1024, fs, 'yaxis');
 
+
+% so our next step is to create a pitch glide using these
+% let's make it similar to that pitch glide according to w0Vec and w0VecEnd
+
+f0V = w0Vec/(2*pi);
+f0VEnd = w0VecEnd/(2*pi);
+
+A = 1;
+tau = -(N*T)./log(0.001);
+x = A*exp(-nT/tau);
+
+% the pitch glides
+f0Exp = (f0VEnd(:) - f0V(:)) * x + f0V(:);
+
+% synthesis with LBFM
+w0VTilde = 2*pi*f0Exp;
+wcVTilde = zeros(Nf, N);
+for f=1:Nf
+    wcVTilde(f,:) = w0VTilde(f,1)/sqrt(1 - BVecStart(f).^2);
+end
+BTilde = sqrt(1 - (w0VTilde./wcVTilde).^2);
+yLBFM5 = zeros(1, N);
+yLBFM5Mat = zeros(NfNL, N);
+yLBFM5Mat(:,1) = 1;
+%for f=1:NfNL
+for f=1:Nf
+    for i=2:N
+        yLBFM5Mat(f,i) = exp(j*wcVTilde(f)*T*(1 + BTilde(f,i) * real(yLBFM5Mat(f,i-1)))) * yLBFM5Mat(f,i-1);
+    end
+    yLBFM5 = yLBFM5 + yLBFM5Mat(f,:) .* envNL1(NLInds(f),:);
+end
 
 
 

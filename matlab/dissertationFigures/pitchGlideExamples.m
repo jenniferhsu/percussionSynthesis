@@ -6,6 +6,9 @@
 
 addpath(genpath('../proofOfConcept'));
 
+savePlots = 1;
+plotOutDir = 'figures/';
+
 % input parameters
 fs = 44100;
 dur = 0.9;
@@ -24,22 +27,22 @@ A_e = 1;
 tau_e = -(N-1)/log(0.001);
 env = A_e * exp(-n/tau_e);
 
-w0 = 2*pi*f0_0;
+%w0 = 2*pi*f0_0;
 
 
 %% Linear increase
 
 f0_0 = 140;         % starting frequency, Hz
-f0_1 = 200;          % ending frequency, Hz
+f0_1 = 840;          % ending frequency, Hz
 
 m = (f0_1 - f0_0)/dur;
 b = f0_0;
-f0Tilde = m*nT + b;
-w0Tilde = 2*pi*f0Tilde;
+f0Lin = m*nT + b;
+w0Tilde = 2*pi*f0Lin;
 
 %% LOOPBACK FM LINEAR INCREASE
 
-wc = w0/sqrt(1 - B^2);
+wc = w0Tilde(end)/sqrt(1 - B^2);
 BTilde = sqrt(1 - (w0Tilde/wc).^2);
 
 yLin = zeros(1, N);
@@ -56,14 +59,14 @@ b0 = (sqrt(1 - B^2) - 1)/B;
 YLin = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
 
 
-%% increasing pitch glide plots
+%% linearly increasing pitch glide plots
 
 figure
 
 subplot(211)
 spectrogram(real(yLin), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Inc/1000, 'r')
+plot(n*T*1000, f0Lin/1000, 'r')
 ylim([0 1])
 title('loopback FM - pitch glide increasing linearly');
 colorbar('off')
@@ -71,17 +74,32 @@ colorbar('off')
 subplot(212)
 spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Inc/1000, 'r')
+plot(n*T*1000, f0Lin/1000, 'r')
 ylim([0 1])
 title('stretched APF - pitch glide increasing linearly');
 colorbar('off')
+
+if savePlots
+    H = figure
+    spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Lin/1000, 'r')
+    ylim([0 1])
+    title('stretched APF - linearly increasing pitch glide');
+    set(gca, 'fontsize', 15)
+    fig = H
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 2.6];
+    print([plotOutDir 'pitchGlideLinIncrease'], '-depsc', '-r0')
+    %close
+end
 
 
 
 %% EXPONENTIAL DECAY
 
 
-f0_0 = 200;         % starting frequency, Hz
+f0_0 = 840;         % starting frequency, Hz
 f0_1 = 140;          % ending frequency, Hz
 
 % exponentially decaying envelope according to the T60
@@ -90,10 +108,10 @@ tau = -(decayT60)/log(0.001);
 e = A * exp(-nT./tau);
 
 % scaled f0 function
-f0Decy = (f0_0 - f0_1) * e + f0_1;
+f0Exp = (f0_0 - f0_1) * e + f0_1;
 
 figure
-plot(nT, f0Decy);
+plot(nT, f0Exp);
 hold on
 plot([decayT60 decayT60], [f0_0 f0_1], 'k--')
 plot([0 decayT60], [f0_1 f0_1], 'k--')
@@ -105,7 +123,7 @@ plot([0 decayT60], [f0_1 f0_1], 'k--')
 % we need to make sure the w0 <= wc. w0Tilde(1) will always be the largest
 % value since this is an exponentially decreasing function. We can use
 % w0Tilde(1) and a user-given B to solve for wc.
-w0Tilde = 2*pi*f0Decy;
+w0Tilde = 2*pi*f0Exp;
 wc = w0Tilde(1)/sqrt(1 - B^2);
 BTilde = sqrt(1 - (w0Tilde/wc).^2);
 
@@ -120,8 +138,9 @@ end
 %% STRETCHED APF EXPONENTIAL DECAY
 
 % ThetaH = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
-
 ThetaH = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
+
+b0 = (sqrt(1 - B^2) - 1)/B;
 YExp = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
 
 %% decaying pitch glide plots
@@ -131,33 +150,47 @@ figure
 subplot(211)
 spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Tilde/1000, 'r')
+plot(n*T*1000, f0Exp/1000, 'r')
 ylim([0 1])
 title('loopback FM - exponentially decaying pitch glide');
 
 subplot(212)
 spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Tilde/1000, 'r')
+plot(n*T*1000, f0Exp/1000, 'r')
 ylim([0 1])
 title('stretched APF - exponentially decaying pitch glide');
 
-
+if savePlots
+    H = figure
+    spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Exp/1000, 'r')
+    ylim([0 1])
+    colorbar('off')
+    title('stretched APF - exponentially decaying pitch glide');
+    set(gca, 'fontsize', 15)
+    fig = H
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 2.6];
+    print([plotOutDir 'pitchGlideExpDecay'], '-depsc', '-r0')
+    %close
+end
 
 %% SQUARE ROOT INCREASE
 
 f0_0 = 140;
-f0_1 = 200;
+f0_1 = 840;
 
 % square-root increase type envelope
 c = f0_0;
 %a = (f0_1 - f0_0)/sqrt(T60Samp);
 %f0Tilde = a*sqrt(n) + c;
 a = (f0_1 - f0_0)/sqrt(decayT60);
-f0Inc = a*sqrt(nT) + c;
+f0Sqrt = a*sqrt(nT) + c;
 
 figure
-plot(nT, f0Inc);
+plot(nT, f0Sqrt);
 hold on
 plot([decayT60 decayT60], [f0_0 f0_1], 'k--')
 plot([0 decayT60], [f0_1 f0_1], 'k--')
@@ -173,10 +206,10 @@ w0Tilde = 2*pi*f0Inc;
 wc = w0Tilde(N-1)/sqrt(1 - B^2);
 BTilde = sqrt(1 - (w0Tilde/wc).^2);
 
-ySq = zeros(1, N);
-ySq(1) = 1;
+ySqrt = zeros(1, N);
+ySqrt(1) = 1;
 for i=2:N
-    ySq(i) = exp(j*wc*T*(1 + BTilde(i) * real(ySq(i-1)))) * ySq(i-1);
+    ySqrt(i) = exp(j*wc*T*(1 + BTilde(i) * real(ySqrt(i-1)))) * ySqrt(i-1);
 end
 
 %% STRETCHED APF SQUAREROOT INCREASE
@@ -184,28 +217,44 @@ end
 % ThetaH = integral[2*pi * (a*sqrt(nT) + c) dnT]
 ThetaH = 2*pi * ((2/3) * a * (nT.^(3/2)) + c*nT);
 b0 = (sqrt(1 - B^2) - 1)/B;
-YSq = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
+YSqrt = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
 
 
-%% increasing pitch glide plots
+%% SQUAREROOT INCREASING PITCH GLIDE
 
 figure
 
 subplot(211)
-spectrogram(real(ySq), hann(1024), 512, 2048, fs, 'yaxis')
+spectrogram(real(ySqrt), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Inc/1000, 'r')
+plot(n*T*1000, f0Sqrt/1000, 'r')
 ylim([0 1])
 title('loopback FM - pitch glide increasing with square root function');
 colorbar('off')
 
 subplot(212)
-spectrogram(real(YSq), hann(1024), 512, 2048, fs, 'yaxis')
+spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Inc/1000, 'r')
+plot(n*T*1000, f0Sqrt/1000, 'r')
 ylim([0 1])
 title('stretched APF - pitch glide increasing with square root function');
 colorbar('off')
+
+if savePlots
+    H = figure
+    spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Sqrt/1000, 'r')
+    ylim([0 1])
+    colorbar('off')
+    title('stretched APF - squareroot increasing pitch glide');
+    set(gca, 'fontsize', 15)
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 2.6];
+    print([plotOutDir 'pitchGlideSqrtIncrease'], '-depsc', '-r0')
+    %close
+end
 
 %% with the setup we already have, how does w0 change with different B
 % functions?
