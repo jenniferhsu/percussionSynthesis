@@ -8,6 +8,7 @@
 
 /* ------------------------ stretchedAPFWT~ ----------------------------- */
 #define WAVETABLE_LENGTH 2048   // length of wavetable
+#define WAVETABLE_LENGTH_OVER_TWO_PI 2048 * (1.0f / (8.0f * atan(1.0f)))
 
 
 /* tilde object to take absolute value. */
@@ -22,6 +23,7 @@ typedef struct _stretchedAPFWT
     t_float x_sr;       /* sample rate */
     t_float x_T;        /* sample period (1/sr) */
     t_float x_n;        /* sample counter */
+    t_float x_sinWavetable[WAVETABLE_LENGTH];   /* the sine wavetable to read from */
 } t_stretchedAPFWT;
 
     /* this is the actual performance routine which acts on the samples.
@@ -110,10 +112,9 @@ static void *stretchedAPFWT_new(void)
     }
 
     // read file into array
-    float sinWavetable[WAVETABLE_LENGTH];
     int i;
     for (i = 0; i < WAVETABLE_LENGTH; i++) {
-        fscanf(myFile, "%f,", &sinWavetable[i] );
+        fscanf(myFile, "%f,", &x->x_sinWavetable[i] );
     }
     // print out wavetable contents
     // post("wavetable is: \n");
