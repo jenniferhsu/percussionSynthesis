@@ -71,7 +71,7 @@ a0 = 1/exp(-1/tau);
 aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
                                             % starting amplitudes
 
-e = g.^(linspace(0, N, N));   % exponential decay
+e = 0.9999.^(linspace(0, N, N));   % exponential decay
 
 env = zeros(Nf, N);
 for i=1:Nf
@@ -85,56 +85,45 @@ end
 
 %% find the pitch glide that I am using in this example
 % set the pitch glide with feedback parameter B
-B1 = 0.5;
-B2 = 0.7;
-k = (B2 - B1)/(N - 1);
-l = B1 - k;
-%BVec2 = linspace(0.5, 0.7, N);
-%BVec2 = linspace(0.05, 0.999, N);  % use this for really obvious tests
-BVec2 = k*n + l;
 
-% find wc using the modal frequencies from w0
-fcVecBar2 = fVecBar./(sqrt(1-BVec2(1)^2));
-
-f0VecBar2 = fcVecBar2(:) .* sqrt(1 - BVec2.^2);
-
+f0VecBarPG = fcVecBar(:) .* sqrt(1 - BVec'.^2);
 
 
 %% loopback FM
 
 % synthesize the loopback FM signal
-[yLBFM, ~] = feedbackFMSynthesis(fcVecBar2, BVec2, env, fs);
-%[yLBFM, ~] = feedbackFMSynthesis(fcVecBar, BVec, env, fs);
-
+[yLBFM, ~] = feedbackFMSynthesis(fcVecBar, BVec, env, fs);
 
 
 %% modal synthesis (sinusoidal) with exponential decay using the modes
-f0VecBar2PG = (fcVecBar2(:)*T/(2*k)) .* ((k*n + l) .* sqrt(1 - (k*n + l).^2) + asin(k*n + l));
-[yMSPG, yMSMat] = modalSynthSine(f0VecBar2PG, env, fs, 1);
+u = sqrt(1 - BVec.^2)';
+C = 0;                      % constant of integration
+Theta = (fcVecBar(:)*T/log(g)) .* (u - atanh(u) + C);
+[yMSPG, yMSMat] = modalSynthSine(Theta, env, fs, 1);
 
 
 %% modal synthesis (bandpass) with exponential decay using the modes
-[yMSBP, yMSBPMat] = modalSynthBP(f0VecBar2, env, fs);
+[yMSBP, yMSBPMat] = modalSynthBP(f0VecBarPG, env, fs);
 
 
 if plotSpectrograms == 1
     figure
     subplot(311)
-    spectrogram(real(yMS), hann(256), 128, 1024, fs, 'yaxis');
+    spectrogram(real(yMSPG), hann(256), 128, 1024, fs, 'yaxis');
     hold on
-    plot(linspace(0, 2, N), f0VecBar2/1000, 'r');
+    plot(linspace(0, 2, N), f0VecBarPG/1000, 'r');
     ylim([0 3])
     title('MS spectrogram (sinusoid)')
     subplot(312)
     spectrogram(real(yMSBP), hann(256), 128, 1024, fs, 'yaxis');
     hold on
-    plot(linspace(0, 2, N), f0VecBar2/1000, 'r');
+    plot(linspace(0, 2, N), f0VecBarPG/1000, 'r');
     ylim([0 3])
     title('MS spectrogram (bandpass)')
     subplot(313)
     spectrogram(real(yLBFM), hann(256), 128, 1024, fs, 'yaxis');
     hold on
-    plot(linspace(0, 2, N), f0VecBar2/1000, 'r');
+    plot(linspace(0, 2, N), f0VecBarPG/1000, 'r');
     ylim([0 3])
     title('loopback FM MS spectrogram')
 end

@@ -1,7 +1,10 @@
-% LBFMModalSynthesisVsModalSynthesis.m
+% LBFMModalSynthesisVsModalSynthesisV2.m
 % This creates the figures that compare the results of Loopback FM Modal
 % Synthesis with canonical modal synthesis (it would be additive synthesis
 % in this case)
+%
+% fixed the graph titles to not say "stretched allpass filter" and to say
+% h_i(n) or H_i(n) instead
 
 addpath(genpath('../modalFrequencyEquations'));
 addpath(genpath('../proofOfConcept'));
@@ -13,9 +16,9 @@ fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
 plotSMCFigures = 1;
-saveSMCFigures = 0;
+saveSMCFigures = 1;
 
-saveDir = 'figures/';
+saveDir = 'figures/V2/';
 if ~exist(saveDir, 'dir')
     mkdir(saveDir);
 end
@@ -159,11 +162,11 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS spectrogram, f_c=2000Hz')
+    title('Spectrogram of MS using h_i(n), f_c=2000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_low1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS spectrogram, f_c=2000Hz')
+    title('Spectrogram of MS using H_i(n), f_c=2000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
         saveas(gcf, [saveDir 'rotationVsSAPF_f_low'], 'epsc')
@@ -173,11 +176,11 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS with pitch glide spectrogram, f_c=2000Hz')
+    title('Spectrogram of MS using h_i(n) oscillators with a pitch glide, f_c=2000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_low2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS with pitch glide spectrogram, f_c=2000Hz')
+    title('Spectrogram of MS using H_i(n) oscillators with a pitch glide, f_c=2000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
         saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_low'], 'epsc')
@@ -187,11 +190,11 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS spectrogram, f_c=4000Hz')
+    title('Spectrogram of MS using h_i(n) oscillators, f_c=4000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_high1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS spectrogram, f_c=4000Hz')
+    title('Spectrogram of MS using H_i(n) oscillators, f_c=4000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
         saveas(gcf, [saveDir 'rotationVsSAPF_f_high'], 'epsc')
@@ -201,11 +204,11 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS with pitch glide spectrogram, f_c=4000Hz')
+    title('Spectrogram of MS using h_i(n) oscillators with pitch glide, f_c=4000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_high2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS with pitch glide spectrogram, f_c=4000Hz')
+    title('Spectrogram of MS using H_i(n) oscillators with pitch glide, f_c=4000Hz')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
         saveas(gcf, [saveDir 'rotationVsSAPF_pitchGlide_f_high'], 'epsc')
@@ -216,11 +219,11 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFM_fcIsModal), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM modal synthesis with f_c = f(i)')
+    title('Loopback FM modal synthesis with f_c = f_i')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yFBFM_f0IsModal), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM modal synthesis with f_0 = f(i)')
+    title('Loopback FM modal synthesis with f_0 = f_i')
     set(gca,'FontSize',15)
     if saveSMCFigures==1
         saveas(gcf, [saveDir 'carrierOrSoundingAsModalFreq'], 'epsc')

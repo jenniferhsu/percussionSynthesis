@@ -13,9 +13,9 @@ fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
 plotSMCFigures = 1;
-saveSMCFigures = 0;
+saveSMCFigures = 1;
 
-saveDir = 'figures/';
+saveDir = 'figures/V2/';
 if ~exist(saveDir, 'dir')
     mkdir(saveDir);
 end
@@ -66,21 +66,21 @@ if plotSMCFigures==1
     figure
     subplot(311)
     spectrogram(real(ySAPFModal_static), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS, static timbre, b_0=-0.6312')
-    set(gca,'FontSize',15)
+    title('MS using H_i(n) oscillators, static timbre, b_0=-0.6312')
+    set(gca,'FontSize',14)
     subplot(312)
     spectrogram(real(ySAPFModal_tv), hann(256), 128, 1024, fs, 'yaxis');
-    title('Stretched APF MS, time-varying timbre, b(n)')
-    set(gca,'FontSize',15)
+    title('MS using H_i(n) oscillators, time-varying timbre, b(n)')
+    set(gca,'FontSize',14)
     subplot(313)
     spectrogram(real(yFBFMModal_tv), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS, time-varying timbre, B(n)')
-    set(gca,'FontSize',15)
+    title('MS using h_i(n) oscillators, time-varying timbre, B(n)')
+    set(gca,'FontSize',14)
     if saveSMCFigures==1
         fig = gcf;
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 8];
-        print('figures/timeVaryingTimbre', '-depsc', '-r0')
+        print('figures/V2/timeVaryingTimbre', '-depsc', '-r0')
     end
     
 end
