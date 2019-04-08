@@ -74,7 +74,7 @@ if plotSMCFigures==1
     set(gca,'FontSize',14)
     subplot(313)
     spectrogram(real(yFBFMModal_tv), hann(256), 128, 1024, fs, 'yaxis');
-    title('MS using h_i(n) oscillators, time-varying timbre, B(n)')
+    title('MS using z_i(n) oscillators, time-varying timbre, B(n)')
     set(gca,'FontSize',14)
     if saveSMCFigures==1
         fig = gcf;

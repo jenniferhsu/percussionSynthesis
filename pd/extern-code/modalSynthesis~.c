@@ -7,6 +7,10 @@
 #endif
 
 
+// TODO:
+// why is only the highest frequency playing right now?
+// fix setA and setT60 functions to take lists and modify variables correctly
+
 /* ------------------------ modalSynthesis~ ----------------------------- */
 #define TWO_PI 8.0f * atan(1.0f)
 #define INVERSE_TWO_PI 1.0f / (8.0f * atan(1.0f))
@@ -23,17 +27,27 @@ static t_class *modalSynthesis_class;
 typedef struct _modalSynthesis
 {
     t_object x_obj;     /* obligatory header */
-    t_float x_f0;
-    //t_float * x_f;        /* list of modal/fundamental frequencies */
-    //t_int x_Nf;         /* number of modal frequencies */
-    t_float x_A;        /* initial amplitude */
-    t_float x_T60;      /* desired T60 time for amplitude envelope */
-    t_float x_ThetaS;   /* instantaneous phase for sine function */
-    t_float x_ThetaC;   /* instantaneous phase for cos function */
+    t_float x_f0;       /* modal frequency */
+    // t_float x_ThetaS;   /* instantaneous phase for sine function */
+    // t_float x_ThetaC;   /* instantaneous phase for cos function */
+    // t_float x_A;        /* initial amplitude */
+    // t_float x_T60;       desired T60 time for amplitude envelope 
+    // t_float x_einc;     /* envelope wavetable increment */
+    // t_float x_eind;     /* envelope index */
+
+    // arrays for multiple sinusoids
+    t_float * x_f;      /* list of modal/fundamental frequencies (length = Nf) */
+    t_float * x_ThetaS; /* list of instantaneous phases for sine function (length = Nf) */
+    t_float * x_ThetaC; /* list of instantaneous phase for cos function (length = Nf) */
+    t_float * x_A;      /* list of initial amplitudes */
+    t_float * x_einc;     /* list of envelope wavetable increments */
+    t_float * x_eind;     /* list of envelope indices */
+    t_int x_Nf;         /* number of modal frequencies */
+    
+
+
     t_float x_sr;       /* sample rate */
     t_float x_T;        /* sample period (1/sr) */
-    t_float x_einc;     /* envelope wavetable increment */
-    t_float x_eind;       /* envelope index */
     t_float * x_sinWavetable;   /* the sine wavetable to read from */
     t_float * x_decayExpWavetable;   /* the decaying exp wavetable to read from */
 
@@ -52,18 +66,24 @@ static t_int *modalSynthesis_perform(t_int *w)
     t_modalSynthesis * x = (t_modalSynthesis *)(w[3]);
     int bufferSize = (int)(w[4]);
 
-    int i;
+    int i, f;
     float sample;
     float re = 0.0f;
     //float im = 0.0f;
-    float offset = TWO_PI * x->x_f0 * x->x_T;
+    //float offset = TWO_PI * x->x_f0 * x->x_T;
     float index, frac, i0, i1;
     float envVal;
+    float oneOverNf = 1.0f / (float)x->x_Nf;
+
+    /* calculate phase offsets */
+    float offset[x->x_Nf];
+    for(f = 0; f < x->x_Nf; f++) {
+        offset[f] = TWO_PI * x->x_f[f] * x->x_T;
+    }
+
     for(i = 0; i < bufferSize; i++)
     {
         
-        /* simple sine wave test */
-
         /* find the indices for the wavetable from the inst. phase
             and linearly interpolate */
         // use this for sine:
@@ -79,6 +99,7 @@ static t_int *modalSynthesis_perform(t_int *w)
         
         /* calculate cosine value using wavetable */
         // for cosine, we need to do cos = sin(pi/2 - Theta)
+        /*
         index = x->x_ThetaC * WAVETABLE_LENGTH_OVER_TWO_PI;
         i0 = trunc(index);
         frac = index - i0;
@@ -86,8 +107,10 @@ static t_int *modalSynthesis_perform(t_int *w)
         if(i1 > WAVETABLE_LENGTH)
             i1 = 0;
         re = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+        */
 
         /* calculate exponentially decaying envelope value using the wavetable */
+        /*
         if(x->x_eind >= ENV_WAVETABLE_LENGTH) {
             envVal = 0.0f;
             x->x_eind = ENV_WAVETABLE_LENGTH-2;
@@ -103,11 +126,64 @@ static t_int *modalSynthesis_perform(t_int *w)
 
 
         sample = x->x_A * envVal * re;
+        */
         //sample = x->x_A * re;
         //sample = re;
-        *(out + i) = sample;
+
+
+        /* trying out an array of frequencies */
+        sample = 0.0f;
+        for(f = 0; f < x->x_Nf; f++) {
+            /* calculate cosine value using wavetable */
+            // for cosine, we need to do cos = sin(pi/2 - Theta)
+        
+            index = x->x_ThetaC[f] * WAVETABLE_LENGTH_OVER_TWO_PI;
+            i0 = trunc(index);
+            frac = index - i0;
+            i1 = i0 + 1.0f;
+            if(i1 > WAVETABLE_LENGTH)
+                i1 = 0;
+            re = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+
+
+            /* calculate exponentially decaying envelope value using the wavetable */
+            if(x->x_eind[f] >= ENV_WAVETABLE_LENGTH) {
+                envVal = 0.0f;
+                x->x_eind[f] = ENV_WAVETABLE_LENGTH-2;
+            } else {
+                i0 = trunc(x->x_eind[f]);
+                frac = x->x_eind[f] - i0;
+                i1 = i0 + 1.0f;
+                if(i1 > ENV_WAVETABLE_LENGTH)
+                    i1 = ENV_WAVETABLE_LENGTH-1;
+                envVal = ((1.0f - frac) * x->x_decayExpWavetable[(int)i0]) + (frac * x->x_decayExpWavetable[(int)i1]);
+                x->x_eind[f] += x->x_einc[f];
+            }
+
+            //sample = sample + re;
+            //sample = x->x_A[f] * envVal * re;
+            sample = sample + x->x_A[f] * envVal * re;
+
+            // increment offset and wrap Theta variables
+            x->x_ThetaS[f] += offset[f];
+            while(x->x_ThetaS[f] < 0)
+                x->x_ThetaS[f] += TWO_PI;
+            while(x->x_ThetaS[f] >= TWO_PI)
+                x->x_ThetaS[f] -= TWO_PI;
+
+            x->x_ThetaC[f] = M_PI_2 - x->x_ThetaS[f];
+            while(x->x_ThetaC[f] < 0)
+                x->x_ThetaC[f] += TWO_PI;
+            while(x->x_ThetaC[f] >= TWO_PI)
+                x->x_ThetaC[f] -= TWO_PI;
+
+        }
+
+        *(out + i) = oneOverNf * sample;
+        
 
         // increment offset and wrap Theta variables
+        /*
         x->x_ThetaS += offset;
         while(x->x_ThetaS < 0)
             x->x_ThetaS += TWO_PI;
@@ -119,6 +195,7 @@ static t_int *modalSynthesis_perform(t_int *w)
             x->x_ThetaC += TWO_PI;
         while(x->x_ThetaC >= TWO_PI)
             x->x_ThetaC -= TWO_PI;
+        */
 
     }
 
@@ -139,23 +216,54 @@ static void modalSynthesis_dsp(t_modalSynthesis *x, t_signal **sp)
 
 void modalSynthesis_bang(t_modalSynthesis *x)
 {
-    x->x_eind = 0.0f;
+    // reset envelope index
+    //x->x_eind = 0.0f;
+
+    // reset oscillator phases
+    // x->x_ThetaS = 0.0f;
+    // x->x_ThetaC = 0.0f;
+
+    int f;
+    float oneOverNf = 1.0f / (float)x->x_Nf;
+    for(f = 0; f < x->x_Nf; f++) {
+
+        // reset envelope index
+        x->x_eind[f] = 0.0f;
+
+        // reset oscillator phases
+        x->x_ThetaS[f] = 0.0f;
+        x->x_ThetaC[f] = 0.0f;
+    }
+    
 }
 
 
 // right inlet callback to set the Feedback FM coefficient
 void modalSynthesis_setA(t_modalSynthesis *x, t_floatarg f)
 {
-    x->x_A = f;
+    //x->x_A = f;
+    
+    int i;
+    for(i = 0; i < x->x_Nf; i++) {
+        x->x_A[i] = f;
+    }
 }
 
 // right inlet callback to set the Feedback FM coefficient
 void modalSynthesis_setT60(t_modalSynthesis *x, t_floatarg f)
 {
-    x->x_T60 = f;
-    t_float T60N = x->x_T60 * x->x_sr;
+    // x->x_T60 = f;
+    // t_float T60N = x->x_T60 * x->x_sr;
 
-    x->x_einc = (float)ENV_WAVETABLE_T60N / T60N;
+    // x->x_einc = (float)ENV_WAVETABLE_T60N / T60N;
+
+    t_float T60 = f;
+    t_float T60N = T60 * x->x_sr;
+
+    int i;
+    for(i = 0; i < x->x_Nf; i++) {
+        x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
+    }
 }
 
 
@@ -170,25 +278,40 @@ static void *modalSynthesis_new(void)
     outlet_new(&x->x_obj, gensym("signal"));
 
     // initialize internal variables
-    x->x_f0 = 220.0f;
-    x->x_A = 1.0f;
-    x->x_T60 = 0.8f;
-    x->x_ThetaS = 0.0f;
-    x->x_ThetaC = 0.0f;
+    //x->x_f0 = 220.0f;
+    //x->x_A = 1.0f;
+    //x->x_T60 = 0.8f;
+    // x->x_ThetaS = 0.0f;
+    // x->x_ThetaC = 0.0f;
 
-    /*
+
     x->x_Nf = 7;
-    x->x_fi = malloc( sizeof(t_float) * x->x_Nf );
-    int i;
-    for(i = 0; i < x->x_Nf; i++) {
-        if(i == 0) {
-            x->x_f[i] = 440.0f;
+    x->x_f = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_ThetaS = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_ThetaC = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_A = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_einc = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_eind = malloc( sizeof(t_float) * x->x_Nf );
+    int f;
+    for(f = 0; f < x->x_Nf; f++) {
+        if(f == 0) {
+            x->x_f[f] = 440.0f;
         } else {
-            x->x_f[i] = 440.0f * (2.0f * i + 3)^2 / 3.011^2;
+            x->x_f[f] = 440.0f * powf(2.0f * f + 3.0f, 2.0f) / powf(3.011f, 2.0f);
         }
-        post("%d: %f\n", i, x->x_f[i]);
+        x->x_ThetaS[f] = 0.0f;
+        x->x_ThetaC[f] = 0.0f;
+        x->x_A[f] = 1.0f;
+        x->x_eind[f] = 0.0f;
+
+        // initialize t60 and envelope variables for 1.0sec for now
+        t_float T60 = 1.0f;
+        t_float T60N = T60 * 44100.0f; // so we have something working by default
+        x->x_einc[f] = (float)ENV_WAVETABLE_T60N / T60N;
+
+        post("%f", x->x_f[f]);
     }
-    */
+    
 
     /* sine wavetable */
     // read in sine wavetable
@@ -259,4 +382,11 @@ void modalSynthesis_tilde_free(t_modalSynthesis *x)
 {
     free(x->x_sinWavetable);
     free(x->x_decayExpWavetable);
+
+    free(x->x_f);
+    free(x->x_ThetaS);
+    free(x->x_ThetaC);
+    free(x->x_A);
+    free(x->x_einc);
+    free(x->x_eind);
 }

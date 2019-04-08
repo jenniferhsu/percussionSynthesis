@@ -162,7 +162,7 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Spectrogram of MS using h_i(n), f_c=2000Hz')
+    title('Spectrogram of MS using z_i(n), f_c=2000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_low1), hann(256), 128, 1024, fs, 'yaxis');
@@ -176,7 +176,7 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Spectrogram of MS using h_i(n) oscillators with a pitch glide, f_c=2000Hz')
+    title('Spectrogram of MS using z_i(n) oscillators with a pitch glide, f_c=2000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_low2), hann(256), 128, 1024, fs, 'yaxis');
@@ -190,7 +190,7 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Spectrogram of MS using h_i(n) oscillators, f_c=4000Hz')
+    title('Spectrogram of MS using z_i(n) oscillators, f_c=4000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_high1), hann(256), 128, 1024, fs, 'yaxis');
@@ -204,7 +204,7 @@ if plotSMCFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Spectrogram of MS using h_i(n) oscillators with pitch glide, f_c=4000Hz')
+    title('Spectrogram of MS using z_i(n) oscillators with pitch glide, f_c=4000Hz')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(ySAPFModal_high2), hann(256), 128, 1024, fs, 'yaxis');

@@ -43,10 +43,11 @@ end
 if size(fVec, 1) == 1 && size(fVec, 2) == 1
     % repeat fVec as a matrix
     fMat = repmat(fVec, [N, 1]);
+elseif size(fVec, 1) == Nf && size(fVec, 2) == 1
+    fMat = repmat(fVec, [N, 1]);
 else
     fMat = fVec;
 end
-
 
 % synthesize modal synthesis signal (using sinusoids)
 yMSMat = zeros(Nf, N); 

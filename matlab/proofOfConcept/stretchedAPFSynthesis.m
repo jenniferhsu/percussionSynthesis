@@ -89,18 +89,31 @@ for i=1:Nf
         
         C = 0; 
         Theta = 2*pi*((m/2*nT.^2) + b*nT + C);
-    elseif strcmp(pitchGlideMode, 'exp')
-        % this one works, but i haven't completely figured out what B is
-        % yet
-%         tau = 1/(log(fVecEnd(i)/f));
-%         %f0 = f*exp(nT./tau);
-%         %w0 = 2*pi*f0;
-%         
-%         b0Vec = b0 * ones(1, N);
-%         
-%         C = 0;                      
-%         Theta = 2*pi*f*tau.*exp(nT./tau) + C;
+    elseif strcmp(pitchGlideMode, 'linearB')
+        % BLin = k*n + l;
+        % ThetaH = (wc*T/(2*k)) * (BLin .* sqrt(1 - BLin.^2) + asin(BLin));
+        % b0 = (sqrt(1-B.^2) - 1)./B;
         
+        % we're assuming that b0 is not time-varying here
+        if size(b0,1) <= 1 || size(b0,2) <= 1
+            B1 = -2*b0/(b0^2 + 1);
+            b0Vec = b0 * ones(1, N);
+        else
+            B1 = -2*b0(1)/(b0(1)^2 + 1);
+            b0Vec = b0;
+        end
+        
+        fc = fVec(i)/(sqrt(1 - B1^2));
+        B2 = sqrt(1 - (fVecEnd(i)/fc)^2);
+        
+        k = (B2 - B1)/(N - 1);
+        l = B1 - k;
+        n = 0:N-1;
+        
+        Theta = (2*pi) * (fc*T/(2*k)) .* ((k*n + l) .* sqrt(1 - (k*n + l).^2) + asin(k*n + l));
+
+    elseif strcmp(pitchGlideMode, 'expB')
+
         g = 0.9999;
         B = g.^(0:N-1)';
         u = sqrt(1 - B.^2);
@@ -109,6 +122,22 @@ for i=1:Nf
         
         C = 0;                      % constant of integration
         Theta = (2*pi*fVecEnd(i)*T/log(g)) .* (u - atanh(u) + C);
+        
+        
+        
+        
+    elseif strcmp(pitchGlideMode, 'exp')
+        % this one works, but i haven't completely figured out what B is
+        % yet
+        tau = 1/(log(fVecEnd(i)/f));
+        %f0 = f*exp(nT./tau);
+        %w0 = 2*pi*f0;
+        
+        b0Vec = b0 * ones(1, N);
+        
+        C = 0;                      
+        Theta = 2*pi*f*tau.*exp(nT./tau) + C;
+        
         
     elseif strcmp(pitchGlideMode, 'fbfm')
         % fVec is ignored here and the starting freq is 0Hz
