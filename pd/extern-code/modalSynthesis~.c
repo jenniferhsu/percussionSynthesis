@@ -237,32 +237,63 @@ void modalSynthesis_bang(t_modalSynthesis *x)
     
 }
 
-
-// right inlet callback to set the Feedback FM coefficient
-void modalSynthesis_setA(t_modalSynthesis *x, t_floatarg f)
+// set the modal frequencies using a message like "setF0 1.0 0.9 0.8"
+void modalSynthesis_setF0(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    //x->x_A = f;
-    
     int i;
-    for(i = 0; i < x->x_Nf; i++) {
-        x->x_A[i] = f;
+    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
+                                        // memory location, but really, we should be able to
+                                        // reallocate the size for F0
+    post("setF0: selector %s", selector->s_name);
+
+    for (i = 0; i < NInds; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            x->x_f[i] = argvec[i].a_w.w_float;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("F0 values must be floats.");
+        }
     }
 }
 
-// right inlet callback to set the Feedback FM coefficient
-void modalSynthesis_setT60(t_modalSynthesis *x, t_floatarg f)
+
+// set the amplitude envelope initial amplitude using a message like "setA 1.0 0.9 0.8"
+void modalSynthesis_setA(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    // x->x_T60 = f;
-    // t_float T60N = x->x_T60 * x->x_sr;
-
-    // x->x_einc = (float)ENV_WAVETABLE_T60N / T60N;
-
-    t_float T60 = f;
-    t_float T60N = T60 * x->x_sr;
-
     int i;
-    for(i = 0; i < x->x_Nf; i++) {
-        x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
+    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
+                                        // memory location, but really, we should be able to
+                                        // reallocate the size for A
+    post("setA: selector %s", selector->s_name);
+
+    for (i = 0; i < NInds; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            x->x_A[i] = argvec[i].a_w.w_float;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("A values must be floats.");
+        }
+    }
+}
+
+// set the T60 times for our amplitude envelopes using a message "setT60 1.0 0.9 0.8"
+void modalSynthesis_setT60(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
+{
+    int i;
+    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
+                                        // memory location, but really, we should be able to
+                                        // reallocate the size for x->x_einc
+    post("setT60: selector %s", selector->s_name);
+
+    t_float T60N;
+    for (i = 0; i < NInds; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            T60N = argvec[i].a_w.w_float * x->x_sr;
+            x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("T60 values must be floats.");
+        }
     }
 }
 
@@ -270,10 +301,7 @@ void modalSynthesis_setT60(t_modalSynthesis *x, t_floatarg f)
 static void *modalSynthesis_new(void)
 {
     t_modalSynthesis *x = (t_modalSynthesis *)pd_new(modalSynthesis_class);
-    // create right inlet for inital amplitude A
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("A"));
-    // create right inlet for T60
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("T60"));
+
     // create outlet for outgoing audio signal
     outlet_new(&x->x_obj, gensym("signal"));
 
@@ -308,8 +336,6 @@ static void *modalSynthesis_new(void)
         t_float T60 = 1.0f;
         t_float T60N = T60 * 44100.0f; // so we have something working by default
         x->x_einc[f] = (float)ENV_WAVETABLE_T60N / T60N;
-
-        post("%f", x->x_f[f]);
     }
     
 
@@ -325,7 +351,6 @@ static void *modalSynthesis_new(void)
     x->x_sinWavetable = (t_float *)malloc(WAVETABLE_LENGTH * sizeof(t_float)); 
     int i;
     for (i = 0; i < WAVETABLE_LENGTH; i++) {
-        //fscanf(myFile, "%f,", &x->x_sinWavetable[i] );
         fscanf(myFile, "%f", &x->x_sinWavetable[i] );
     }
     // print out wavetable contents
@@ -369,11 +394,9 @@ void modalSynthesis_tilde_setup(void)
     when DSP is turned on. */
     class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_dsp, gensym("dsp"), 0);
     class_addbang(modalSynthesis_class, modalSynthesis_bang);
-    
-    // register callback methods for right inlets
-    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setA, gensym("A"), A_FLOAT, 0);
-    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setT60, gensym("T60"), A_FLOAT, 0);
-
+    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setF0, gensym("setF0"), A_GIMME, 0);
+    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setA, gensym("setA"), A_GIMME, 0);
+    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setA, gensym("setT60"), A_GIMME, 0);
 
 }
 

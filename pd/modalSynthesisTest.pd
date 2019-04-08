@@ -1,60 +1,70 @@
-#N canvas 218 105 934 522 10;
-#X obj 237 459 dac~;
-#X obj 255 393 line~;
-#X msg 255 373 \$1 100;
-#X obj 237 425 *~;
-#X text 253 331 level;
-#X obj 240 72 hsl 100 15 50 100 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 1046 1;
-#X obj 237 92 mtof;
-#X text 270 48 MIDI Note;
-#X msg 237 48 77;
-#X obj 368 96 hsl 100 15 0 0.99999 0 0 empty empty empty -2 -8 0 10
--262144 -1 -1 9900 1;
-#X obj 113 67 bng 15 250 50 0 empty empty empty 17 7 0 10 -262144 -1
+#N canvas 183 52 934 522 10;
+#X obj 215 303 dac~;
+#X obj 246 239 line~;
+#X msg 246 219 \$1 100;
+#X obj 215 269 *~;
+#X text 244 177 level;
+#X obj 24 61 bng 25 250 50 0 empty empty empty 17 7 0 10 -261234 -1
 -1;
-#X obj 258 349 hsl 100 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
--1 -1 4800 1;
-#X obj 237 250 modalSynthesis~;
-#X floatatom 243 129 5 0 0 0 - - -, f 5;
-#X text 439 386 modal synthesis;
-#X msg 365 72 1;
-#X obj 418 151 hsl 100 15 0.1 5 0 0 empty empty empty -2 -8 0 10 -262144
+#X obj 249 195 hsl 100 15 0 1 0 0 empty empty empty -2 -8 0 10 -262144
 -1 -1 8200 1;
-#X msg 415 127 1;
-#X msg 461 252 open test.wav;
-#X msg 487 275 start;
-#X msg 499 299 stop;
-#X obj 434 322 writesf~;
-#X text 59 47 bang to initialize;
-#X floatatom 424 177 5 0 0 0 - - -, f 5;
-#X floatatom 370 119 5 0 0 0 - - -, f 5;
-#X text 440 425 middle inlet: A // inital amplitude envelope value
+#X obj 215 149 modalSynthesis~;
+#X msg 66 214 open test.wav;
+#X msg 82 238 start;
+#X msg 90 264 stop;
+#X obj 66 306 writesf~;
+#X text 20 40 bang to synthesize;
+#X text 491 23 marimba;
+#X msg 505 66 setA 1 0.4642 0.2154 0.1 0.0464 0.0215 0.01;
+#X msg 517 207 setT60 1 1 1 1 1 1 1;
+#X msg 495 44 setF0 440 1213 2378 3931 5872 8202 10920;
+#X text 491 150 tom tom;
+#X msg 496 165 setF0 142 305.3 450.14 485.64 580.78 681.6 701.48;
+#X msg 506 186 setA 1 0.4642 0.2154 0.1 0.0464 0.0215 0.01;
+#X msg 517 89 setT60 1 1 1 1 1 1 1;
+#X text 494 266 circular plate;
+#X msg 496 284 setF0 747 2090 3845 4464 7278 10518 11130 15423 20148
 ;
-#X text 439 442 right inlet: T60 // time for amplitude envelope to
-decay to -60dB;
-#X text 438 407 left inlet: modal frequency and bang to initialize
-;
-#X text 396 73 A;
-#X text 446 128 T60;
-#X text 235 30 modal frequency;
+#X msg 506 308 setA 1 0.917 0.8409 0.7711 0.7071 0.6484 0.5946 0.5453
+0.5;
+#X msg 514 345 setT60 1 1 1 1 1 1 1 1 1;
+#X obj 495 113 send setMessages;
+#X obj 215 84 r setMessages;
+#X obj 496 229 send setMessages;
+#X obj 496 368 send setMessages;
+#X obj 70 467 send setMessages;
+#X text 68 378 kick;
+#X msg 70 396 setF0 100;
+#X msg 80 420 setA 1;
+#X msg 88 443 setT60 1;
+#X obj 222 464 send setMessages;
+#X text 220 375 snare;
+#X msg 222 393 setF0 185 330;
+#X msg 240 440 setT60 1 1;
+#X msg 232 417 setA 1 0.01;
 #X connect 1 0 3 1;
 #X connect 2 0 1 0;
 #X connect 3 0 0 0;
-#X connect 5 0 6 0;
-#X connect 6 0 12 0;
-#X connect 6 0 13 0;
-#X connect 8 0 5 0;
-#X connect 9 0 12 1;
-#X connect 9 0 24 0;
-#X connect 10 0 12 0;
-#X connect 11 0 2 0;
-#X connect 12 0 3 0;
-#X connect 12 0 21 0;
-#X connect 15 0 9 0;
-#X connect 16 0 12 2;
-#X connect 16 0 23 0;
-#X connect 17 0 16 0;
-#X connect 18 0 21 0;
-#X connect 19 0 21 0;
-#X connect 20 0 21 0;
+#X connect 5 0 7 0;
+#X connect 6 0 2 0;
+#X connect 7 0 3 0;
+#X connect 7 0 11 0;
+#X connect 8 0 11 0;
+#X connect 9 0 11 0;
+#X connect 10 0 11 0;
+#X connect 14 0 25 0;
+#X connect 15 0 27 0;
+#X connect 16 0 25 0;
+#X connect 18 0 27 0;
+#X connect 19 0 27 0;
+#X connect 20 0 25 0;
+#X connect 22 0 28 0;
+#X connect 23 0 28 0;
+#X connect 24 0 28 0;
+#X connect 26 0 7 0;
+#X connect 31 0 29 0;
+#X connect 32 0 29 0;
+#X connect 33 0 29 0;
+#X connect 36 0 34 0;
+#X connect 37 0 34 0;
+#X connect 38 0 34 0;
