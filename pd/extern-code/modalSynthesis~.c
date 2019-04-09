@@ -166,7 +166,6 @@ void modalSynthesis_bang(t_modalSynthesis *x)
 {
 
     int f;
-    float oneOverNf = 1.0f / (float)x->x_Nf;
     for(f = 0; f < x->x_Nf; f++) {
 
         // reset envelope index
