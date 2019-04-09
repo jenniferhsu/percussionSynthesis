@@ -40,9 +40,12 @@ typedef struct _modalSynthesis
     t_float * x_ThetaS; /* list of instantaneous phases for sine function (length = Nf) */
     t_float * x_ThetaC; /* list of instantaneous phase for cos function (length = Nf) */
     t_float * x_A;      /* list of initial amplitudes */
-    t_float * x_einc;     /* list of envelope wavetable increments */
-    t_float * x_eind;     /* list of envelope indices */
+    t_float * x_einc;   /* list of envelope wavetable increments */
+    t_float * x_eind;   /* list of envelope indices */
     t_int x_Nf;         /* number of modal frequencies */
+    t_int x_NA;         /* number of envelope initial amplitudes */
+    t_int x_NE;         /* number of envelope increments */
+    t_int x_N;          /* holds minimum of x_Nf, x_NA, x_NE */
     
 
 
@@ -73,7 +76,7 @@ static t_int *modalSynthesis_perform(t_int *w)
     //float offset = TWO_PI * x->x_f0 * x->x_T;
     float index, frac, i0, i1;
     float envVal;
-    float oneOverNf = 1.0f / (float)x->x_Nf;
+    float oneOverN = 1.0f / (float)x->x_N;
 
     /* calculate phase offsets */
     float offset[x->x_Nf];
@@ -133,7 +136,7 @@ static t_int *modalSynthesis_perform(t_int *w)
 
         /* trying out an array of frequencies */
         sample = 0.0f;
-        for(f = 0; f < x->x_Nf; f++) {
+        for(f = 0; f < x->x_N; f++) {
             /* calculate cosine value using wavetable */
             // for cosine, we need to do cos = sin(pi/2 - Theta)
         
@@ -179,7 +182,7 @@ static t_int *modalSynthesis_perform(t_int *w)
 
         }
 
-        *(out + i) = oneOverNf * sample;
+        *(out + i) = oneOverN * sample;
         
 
         // increment offset and wrap Theta variables
@@ -240,33 +243,60 @@ void modalSynthesis_bang(t_modalSynthesis *x)
 // set the modal frequencies using a message like "setF0 1.0 0.9 0.8"
 void modalSynthesis_setF0(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    int i;
-    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
-                                        // memory location, but really, we should be able to
-                                        // reallocate the size for F0
+
     post("setF0: selector %s", selector->s_name);
 
-    for (i = 0; i < NInds; i++)
+    if(argcount > x->x_Nf) 
+    {
+        // allocate space for x->x_f, x->x_ThetaS, x->x_ThetaC
+        free(x->x_f);
+        free(x->x_ThetaS);
+        free(x->x_ThetaC);
+        x->x_f = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_ThetaS = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_ThetaC = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_Nf = argcount;
+
+    // copy values into x->x_Nf
+    int i;
+    for (i = 0; i < x->x_Nf; i++)
     {
         if (argvec[i].a_type == A_FLOAT) {
             x->x_f[i] = argvec[i].a_w.w_float;
+            x->x_ThetaS[i] = 0.0f;
+            x->x_ThetaC[i] = 0.0f;
         } else if (argvec[i].a_type == A_SYMBOL) {
             post("F0 values must be floats.");
         }
     }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
+
 }
 
 
 // set the amplitude envelope initial amplitude using a message like "setA 1.0 0.9 0.8"
 void modalSynthesis_setA(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    int i;
-    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
-                                        // memory location, but really, we should be able to
-                                        // reallocate the size for A
+
     post("setA: selector %s", selector->s_name);
 
-    for (i = 0; i < NInds; i++)
+    if(argcount > x->x_NA) 
+    {
+        // allocate space for x->x_A
+        free(x->x_A);
+        x->x_A = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_NA = argcount;
+    
+   
+    int i;
+    for (i = 0; i < x->x_NA; i++)
     {
         if (argvec[i].a_type == A_FLOAT) {
             x->x_A[i] = argvec[i].a_w.w_float;
@@ -274,27 +304,46 @@ void modalSynthesis_setA(t_modalSynthesis *x,t_symbol *selector, int argcount, t
             post("A values must be floats.");
         }
     }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
 }
 
 // set the T60 times for our amplitude envelopes using a message "setT60 1.0 0.9 0.8"
 void modalSynthesis_setT60(t_modalSynthesis *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    int i;
-    int NInds = fmin(x->x_Nf, argcount); // for now, make sure we don't overwrite into the incorrect
-                                        // memory location, but really, we should be able to
-                                        // reallocate the size for x->x_einc
+
     post("setT60: selector %s", selector->s_name);
 
+    if(argcount > x->x_NE) 
+    {
+        // allocate space for x->x_einc and x->x_eind
+        free(x->x_einc);
+        free(x->x_eind);
+        x->x_einc = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_eind = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_NA = argcount;
+    
+    // figure out all new values for x->x_einc
+    int i;
     t_float T60N;
-    for (i = 0; i < NInds; i++)
+    for (i = 0; i < x->x_NE; i++)
     {
         if (argvec[i].a_type == A_FLOAT) {
             T60N = argvec[i].a_w.w_float * x->x_sr;
             x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
+            x->x_eind[i] = 0.0f;
         } else if (argvec[i].a_type == A_SYMBOL) {
             post("T60 values must be floats.");
         }
     }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
 }
 
 
@@ -314,14 +363,20 @@ static void *modalSynthesis_new(void)
 
 
     x->x_Nf = 7;
+    x->x_NA = 7;
+    x->x_NE = 7;
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
+
     x->x_f = malloc( sizeof(t_float) * x->x_Nf );
     x->x_ThetaS = malloc( sizeof(t_float) * x->x_Nf );
     x->x_ThetaC = malloc( sizeof(t_float) * x->x_Nf );
-    x->x_A = malloc( sizeof(t_float) * x->x_Nf );
-    x->x_einc = malloc( sizeof(t_float) * x->x_Nf );
-    x->x_eind = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_A = malloc( sizeof(t_float) * x->x_NA );
+    x->x_einc = malloc( sizeof(t_float) * x->x_NE );
+    x->x_eind = malloc( sizeof(t_float) * x->x_NE );
+
     int f;
-    for(f = 0; f < x->x_Nf; f++) {
+    for(f = 0; f < x->x_N; f++) {
         if(f == 0) {
             x->x_f[f] = 440.0f;
         } else {
@@ -330,12 +385,12 @@ static void *modalSynthesis_new(void)
         x->x_ThetaS[f] = 0.0f;
         x->x_ThetaC[f] = 0.0f;
         x->x_A[f] = 1.0f;
-        x->x_eind[f] = 0.0f;
 
         // initialize t60 and envelope variables for 1.0sec for now
         t_float T60 = 1.0f;
         t_float T60N = T60 * 44100.0f; // so we have something working by default
         x->x_einc[f] = (float)ENV_WAVETABLE_T60N / T60N;
+        x->x_eind[f] = 0.0f;
     }
     
 
