@@ -144,22 +144,6 @@ static t_int *modalSynthesis_perform(t_int *w)
         }
 
         *(out + i) = oneOverN * sample;
-        
-
-        // increment offset and wrap Theta variables
-        /*
-        x->x_ThetaS += offset;
-        while(x->x_ThetaS < 0)
-            x->x_ThetaS += TWO_PI;
-        while(x->x_ThetaS >= TWO_PI)
-            x->x_ThetaS -= TWO_PI;
-
-        x->x_ThetaC = M_PI_2 - x->x_ThetaS;
-        while(x->x_ThetaC < 0)
-            x->x_ThetaC += TWO_PI;
-        while(x->x_ThetaC >= TWO_PI)
-            x->x_ThetaC -= TWO_PI;
-        */
 
     }
 
@@ -180,12 +164,6 @@ static void modalSynthesis_dsp(t_modalSynthesis *x, t_signal **sp)
 
 void modalSynthesis_bang(t_modalSynthesis *x)
 {
-    // reset envelope index
-    //x->x_eind = 0.0f;
-
-    // reset oscillator phases
-    // x->x_ThetaS = 0.0f;
-    // x->x_ThetaC = 0.0f;
 
     int f;
     float oneOverNf = 1.0f / (float)x->x_Nf;
