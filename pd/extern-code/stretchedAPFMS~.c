@@ -19,6 +19,7 @@
  a sine wave and use x->x_ThetaC = M_PI_2 - x->x_ThetaS; to find the theta for cosine
  (this isn't a big deal though)
 2. build a table for atan: or if it's slow, use a taylor series approximation
+3. Add a function for setting b0 values
 */
 
 
@@ -30,13 +31,28 @@ typedef struct _stretchedAPFMS
 {
     t_object x_obj; 	/* obligatory header */
     t_float x_f0;    	/* sounding frequency */
-    t_float x_ThetaS;   /* oscillator phase for sin*/
-    t_float x_ThetaC;   /* oscillator phase for cos*/
-    t_float x_b0;       /* stretched APF coefficient/timbre control */
 
-    t_float x_A;        /* list of initial amplitudes */
-    t_float x_einc;     /* list of envelope wavetable increments */
-    t_float x_eind;     /* list of envelope indices */
+
+    // t_float x_ThetaS;   /* oscillator phase for sin*/
+    // t_float x_ThetaC;   /* oscillator phase for cos*/
+    // t_float x_b0;       /* stretched APF coefficient/timbre control */
+
+    // t_float x_A;        /* list of initial amplitudes */
+    // t_float x_einc;     /* list of envelope wavetable increments */
+    // t_float x_eind;     /* list of envelope indices */
+
+    // arrays for multiple sinusoids
+    t_float * x_f;      /* list of modal/fundamental frequencies (length = Nf) */
+    t_float * x_b0;     /* list of stretched APF coefficient/timbre control parameters (length = Nf) */
+    t_float * x_ThetaS; /* list of instantaneous phases for sine function (length = Nf) */
+    t_float * x_ThetaC; /* list of instantaneous phase for cos function (length = Nf) */
+    t_float * x_A;      /* list of initial amplitudes (length = NA) */
+    t_float * x_einc;   /* list of envelope wavetable increments (length = NE)*/
+    t_float * x_eind;   /* list of envelope indices (length = NE) */
+    t_int x_Nf;         /* number of modal frequencies */
+    t_int x_NA;         /* number of envelope initial amplitudes */
+    t_int x_NE;         /* number of envelope increments */
+    t_int x_N;          /* holds minimum of x_Nf, x_NA, x_NE */
 
     t_float x_sr;       /* sample rate */
     t_float x_T;        /* sample period (1/sr) */
@@ -58,83 +74,99 @@ static t_int *stretchedAPFMS_perform(t_int *w)
     t_stretchedAPFMS * x = (t_stretchedAPFMS *)(w[3]);
     int bufferSize = (int)(w[4]);
 
-    int i;
-    float offset = TWO_PI * x->x_f0 * x->x_T;
+    int i, f;
+    float sample;
     float index, frac, i0, i1;
     float sinTheta, cosTheta;
     float angleH = 0.0f;
     float realH = 0.0f;
     float envVal = 0.0f;
-    //float samplePeriod = x->x_sr * (1.0f/x->x_f0);
+    float oneOverN = 1.0f / (float)x->x_N;
+
+    /* calculate phase offsets */
+    float offset[x->x_Nf];
+    for(f = 0; f < x->x_Nf; f++) {
+        offset[f] = TWO_PI * x->x_f[f] * x->x_T;
+    }
+
     for(i = 0; i < bufferSize; i++)
     {
 
-        /* sin(x->xTheta) */
-        index = x->x_ThetaS * WAVETABLE_LENGTH_OVER_TWO_PI;
-        i0 = trunc(index);
-        frac = index - i0;
-        i1 = i0 + 1.0f;
-        if(i1 > WAVETABLE_LENGTH)
-            i1 = 0;
-        sinTheta = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+        /* for an array of frequencies */
+        sample = 0.0f;
+        for(f = 0; f < x->x_N; f++) {
 
-        /* cos(x->xTheta) */
-        index = x->x_ThetaC * WAVETABLE_LENGTH_OVER_TWO_PI;
-        i0 = trunc(index);
-        frac = index - i0;
-        i1 = i0 + 1.0f;
-        if(i1 > WAVETABLE_LENGTH)
-            i1 = 0;
-        cosTheta = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
-
-        angleH = x->x_ThetaS - (2.0f * atan(x->x_b0 * sinTheta / (1.0f + x->x_b0 * cosTheta)));
-        //realH = cos(angleH);
-
-        /* find cos(angleH) to get the real(H) */
-        angleH = fmod(angleH, TWO_PI);
-        angleH = M_PI_2 - angleH;   // for cos
-        while(angleH < 0)
-            angleH += TWO_PI;
-        while(angleH >= TWO_PI)
-            angleH -= TWO_PI;
-        index = angleH * WAVETABLE_LENGTH_OVER_TWO_PI;
-        i0 = trunc(index);
-        frac = index - i0;
-        i1 = i0 + 1.0f;
-        if(i1 > WAVETABLE_LENGTH)
-            i1 = 0;
-        realH = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
-
-        /* calculate exponentially decaying envelope value using the wavetable */
-        if(x->x_eind >= ENV_WAVETABLE_LENGTH) {
-            envVal = 0.0f;
-            x->x_eind = ENV_WAVETABLE_LENGTH-2;
-        } else {
-            i0 = trunc(x->x_eind);
-            frac = x->x_eind - i0;
+            /* sin(x->xTheta) */
+            index = x->x_ThetaS[f] * WAVETABLE_LENGTH_OVER_TWO_PI;
+            i0 = trunc(index);
+            frac = index - i0;
             i1 = i0 + 1.0f;
-            if(i1 > ENV_WAVETABLE_LENGTH)
-                i1 = ENV_WAVETABLE_LENGTH-1;
-            envVal = ((1.0f - frac) * x->x_decayExpWavetable[(int)i0]) + (frac * x->x_decayExpWavetable[(int)i1]);
-            x->x_eind += x->x_einc;
+            if(i1 > WAVETABLE_LENGTH)
+                i1 = 0;
+            sinTheta = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+
+            /* cos(x->xTheta) */
+            index = x->x_ThetaC[f] * WAVETABLE_LENGTH_OVER_TWO_PI;
+            i0 = trunc(index);
+            frac = index - i0;
+            i1 = i0 + 1.0f;
+            if(i1 > WAVETABLE_LENGTH)
+                i1 = 0;
+            cosTheta = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+
+            angleH = x->x_ThetaS[f] - (2.0f * atan(x->x_b0[f] * sinTheta / (1.0f + x->x_b0[f] * cosTheta)));
+        
+
+            /* find cos(angleH) to get the real(H) */
+            angleH = fmod(angleH, TWO_PI);
+            angleH = M_PI_2 - angleH;   // for cos
+            while(angleH < 0)
+                angleH += TWO_PI;
+            while(angleH >= TWO_PI)
+                angleH -= TWO_PI;
+            index = angleH * WAVETABLE_LENGTH_OVER_TWO_PI;
+            i0 = trunc(index);
+            frac = index - i0;
+            i1 = i0 + 1.0f;
+            if(i1 > WAVETABLE_LENGTH)
+                i1 = 0;
+            realH = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+
+            /* calculate exponentially decaying envelope value using the wavetable */
+            if(x->x_eind[f] >= ENV_WAVETABLE_LENGTH) {
+                envVal = 0.0f;
+                x->x_eind[f] = ENV_WAVETABLE_LENGTH-2;
+            } else {
+                i0 = trunc(x->x_eind[f]);
+                frac = x->x_eind[f] - i0;
+                i1 = i0 + 1.0f;
+                if(i1 > ENV_WAVETABLE_LENGTH)
+                    i1 = ENV_WAVETABLE_LENGTH-1;
+                envVal = ((1.0f - frac) * x->x_decayExpWavetable[(int)i0]) + (frac * x->x_decayExpWavetable[(int)i1]);
+                x->x_eind[f] += x->x_einc[f];
+            }
+
+            sample = sample + x->x_A[f] * envVal * realH;
+
+            // increment offset and wrap Theta variables
+            x->x_ThetaS[f] += offset[f];
+            while(x->x_ThetaS[f] < 0)
+                x->x_ThetaS[f] += TWO_PI;
+            while(x->x_ThetaS[f] >= TWO_PI)
+                x->x_ThetaS[f] -= TWO_PI;
+
+            x->x_ThetaC[f] = M_PI_2 - x->x_ThetaS[f];
+            while(x->x_ThetaC[f] < 0)
+                x->x_ThetaC[f] += TWO_PI;
+            while(x->x_ThetaC[f] >= TWO_PI)
+                x->x_ThetaC[f] -= TWO_PI;
         }
 
+
         // output sample 
-        *(out + i) = x->x_A * envVal * realH;
+        *(out + i) = oneOverN * sample;
+        //*(out + i) = x->x_A * envVal * realH;
         //*(out + i) = realH;
-
-        // increment offset and wrap Theta variables
-        x->x_ThetaS += offset;
-        while(x->x_ThetaS < 0)
-            x->x_ThetaS += TWO_PI;
-        while(x->x_ThetaS >= TWO_PI)
-            x->x_ThetaS -= TWO_PI;
-
-        x->x_ThetaC = M_PI_2 - x->x_ThetaS;
-        while(x->x_ThetaC < 0)
-            x->x_ThetaC += TWO_PI;
-        while(x->x_ThetaC >= TWO_PI)
-            x->x_ThetaC -= TWO_PI;
 
     }
 
@@ -155,20 +187,129 @@ static void stretchedAPFMS_dsp(t_stretchedAPFMS *x, t_signal **sp)
 
 void stretchedAPFMS_bang(t_stretchedAPFMS *x)
 {
+    int f;
+    for(f = 0; f < x->x_Nf; f++) {
 
-    // reset envelope index
-    x->x_eind = 0.0f;
+        // reset envelope index
+        x->x_eind[f] = 0.0f;
 
-    // reset oscillator phase
-    x->x_ThetaS = 0.0f;
-    x->x_ThetaC = 0.0f;
+        // reset oscillator phases
+        x->x_ThetaS[f] = 0.0f;
+        x->x_ThetaC[f] = 0.0f;
+    }
 }
 
 
 // right inlet callback to set the stretched APF coefficient
-void stretchedAPFMS_setb0(t_stretchedAPFMS *x, t_floatarg f)
+// void stretchedAPFMS_setb0(t_stretchedAPFMS *x, t_floatarg f)
+// {
+//     x->x_b0 = f;
+// }
+
+// set the modal frequencies using a message like "setF0 1.0 0.9 0.8"
+void stretchedAPFMS_setF0(t_stretchedAPFMS *x,t_symbol *selector, int argcount, t_atom *argvec)
 {
-    x->x_b0 = f;
+
+    post("setF0: selector %s", selector->s_name);
+
+    if(argcount > x->x_Nf) 
+    {
+        // allocate space for x->x_f, x->x_ThetaS, x->x_ThetaC
+        free(x->x_f);
+        free(x->x_ThetaS);
+        free(x->x_ThetaC);
+        x->x_f = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_ThetaS = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_ThetaC = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_Nf = argcount;
+
+    // copy values into x->x_Nf
+    int i;
+    for (i = 0; i < x->x_Nf; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            x->x_f[i] = argvec[i].a_w.w_float;
+            x->x_ThetaS[i] = 0.0f;
+            x->x_ThetaC[i] = 0.0f;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("F0 values must be floats.");
+        }
+    }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
+
+}
+
+
+// set the amplitude envelope initial amplitude using a message like "setA 1.0 0.9 0.8"
+void stretchedAPFMS_setA(t_stretchedAPFMS *x,t_symbol *selector, int argcount, t_atom *argvec)
+{
+
+    post("setA: selector %s", selector->s_name);
+
+    if(argcount > x->x_NA) 
+    {
+        // allocate space for x->x_A
+        free(x->x_A);
+        x->x_A = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_NA = argcount;
+    
+   
+    int i;
+    for (i = 0; i < x->x_NA; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            x->x_A[i] = argvec[i].a_w.w_float;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("A values must be floats.");
+        }
+    }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
+}
+
+// set the T60 times for our amplitude envelopes using a message "setT60 1.0 0.9 0.8"
+void stretchedAPFMS_setT60(t_stretchedAPFMS *x,t_symbol *selector, int argcount, t_atom *argvec)
+{
+
+    post("setT60: selector %s", selector->s_name);
+
+    if(argcount > x->x_NE) 
+    {
+        // allocate space for x->x_einc and x->x_eind
+        free(x->x_einc);
+        free(x->x_eind);
+        x->x_einc = (t_float *)malloc(argcount * sizeof(t_float));
+        x->x_eind = (t_float *)malloc(argcount * sizeof(t_float));
+    }
+
+     x->x_NE = argcount;
+    
+    // figure out all new values for x->x_einc
+    int i;
+    t_float T60N;
+    for (i = 0; i < x->x_NE; i++)
+    {
+        if (argvec[i].a_type == A_FLOAT) {
+            T60N = argvec[i].a_w.w_float * x->x_sr;
+            x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
+            //x->x_eind[i] = 0.0f;
+        } else if (argvec[i].a_type == A_SYMBOL) {
+            post("T60 values must be floats.");
+        }
+    }
+
+    // adjust x->x_N 
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
 }
 
 
@@ -176,22 +317,56 @@ static void *stretchedAPFMS_new(void)
 {
     t_stretchedAPFMS*x = (t_stretchedAPFMS *)pd_new(stretchedAPFMS_class);
     // create right inlet for stretched APF coefficient b0
-    inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("b0"));
+    //inlet_new(&x->x_obj, &x->x_obj.ob_pd, gensym("float"), gensym("b0"));
     // create outlet for outgoing audio signal
     outlet_new(&x->x_obj, gensym("signal"));
 
     // initialize internal variables
-    x->x_f0 = 304.0f;
-    x->x_ThetaS = 0.0f;
-    x->x_ThetaC = 0.0f;
-    x->x_b0 = 0.9f;
+    // x->x_f0 = 304.0f;
+    // x->x_ThetaS = 0.0f;
+    // x->x_ThetaC = 0.0f;
+    // x->x_b0 = 0.9f;
 
-    x->x_A = 1.0f;
-    // initialize t60 and envelope variables for 1.0sec for now
-    t_float T60 = 1.0f;
-    t_float T60N = T60 * 44100.0f; // so we have something working by default
-    x->x_einc = (float)ENV_WAVETABLE_T60N / T60N;
-    x->x_eind = 0.0f;
+    // x->x_A = 1.0f;
+    // // initialize t60 and envelope variables for 1.0sec for now
+    // t_float T60 = 1.0f;
+    // t_float T60N = T60 * 44100.0f; // so we have something working by default
+    // x->x_einc = (float)ENV_WAVETABLE_T60N / T60N;
+    // x->x_eind = 0.0f;
+
+    x->x_Nf = 7;
+    x->x_NA = 7;
+    x->x_NE = 7;
+    x->x_N = fmin(x->x_Nf, x->x_NA);
+    x->x_N = fmin(x->x_N, x->x_NE);
+
+    x->x_f = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_b0 = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_ThetaS = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_ThetaC = malloc( sizeof(t_float) * x->x_Nf );
+    x->x_A = malloc( sizeof(t_float) * x->x_NA );
+    x->x_einc = malloc( sizeof(t_float) * x->x_NE );
+    x->x_eind = malloc( sizeof(t_float) * x->x_NE );
+
+    int f;
+    for(f = 0; f < x->x_N; f++) {
+        if(f == 0) {
+            x->x_f[f] = 440.0f;
+        } else {
+            x->x_f[f] = 440.0f * powf(2.0f * f + 3.0f, 2.0f) / powf(3.011f, 2.0f);
+        }
+        x->x_b0[f] = -0.6f;
+        x->x_ThetaS[f] = 0.0f;
+        x->x_ThetaC[f] = 0.0f;
+        x->x_A[f] = 1.0f;
+
+        // initialize t60 and envelope variables for 1.0sec for now
+        t_float T60 = 1.0f;
+        t_float T60N = T60 * 44100.0f; // so we have something working by default
+        x->x_einc[f] = (float)ENV_WAVETABLE_T60N / T60N;
+        //x->x_eind[f] = 0.0f;
+        x->x_eind[f] = ENV_WAVETABLE_LENGTH;
+    }
 
     /* sine wavetable */
     // read in sine wavetable
@@ -247,8 +422,25 @@ void stretchedAPFMS_tilde_setup(void)
 	when DSP is turned on. */
     class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_dsp, gensym("dsp"), 0);
     class_addbang(stretchedAPFMS_class, stretchedAPFMS_bang);
+    class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_setF0, gensym("setF0"), A_GIMME, 0);
+    class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_setA, gensym("setA"), A_GIMME, 0);
+    class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_setT60, gensym("setT60"), A_GIMME, 0);
     
     // register callback method for right inlet float
-    class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_setb0, gensym("b0"), A_FLOAT, 0);
+    //class_addmethod(stretchedAPFMS_class, (t_method)stretchedAPFMS_setb0, gensym("b0"), A_FLOAT, 0);
 
+}
+
+void stretchedAPFMS_tilde_free(t_stretchedAPFMS *x)
+{
+    free(x->x_sinWavetable);
+    free(x->x_decayExpWavetable);
+
+    free(x->x_f);
+    free(x->x_b0);
+    free(x->x_ThetaS);
+    free(x->x_ThetaC);
+    free(x->x_A);
+    free(x->x_einc);
+    free(x->x_eind);
 }

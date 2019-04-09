@@ -263,7 +263,7 @@ void modalSynthesis_setT60(t_modalSynthesis *x,t_symbol *selector, int argcount,
         x->x_eind = (t_float *)malloc(argcount * sizeof(t_float));
     }
 
-     x->x_NA = argcount;
+     x->x_NE = argcount;
     
     // figure out all new values for x->x_einc
     int i;
@@ -273,7 +273,7 @@ void modalSynthesis_setT60(t_modalSynthesis *x,t_symbol *selector, int argcount,
         if (argvec[i].a_type == A_FLOAT) {
             T60N = argvec[i].a_w.w_float * x->x_sr;
             x->x_einc[i] = (float)ENV_WAVETABLE_T60N / T60N;
-            x->x_eind[i] = 0.0f;
+            //x->x_eind[i] = 0.0f;
         } else if (argvec[i].a_type == A_SYMBOL) {
             post("T60 values must be floats.");
         }
@@ -328,7 +328,8 @@ static void *modalSynthesis_new(void)
         t_float T60 = 1.0f;
         t_float T60N = T60 * 44100.0f; // so we have something working by default
         x->x_einc[f] = (float)ENV_WAVETABLE_T60N / T60N;
-        x->x_eind[f] = 0.0f;
+        //x->x_eind[f] = 0.0f;
+        x->x_eind[f] = ENV_WAVETABLE_LENGTH;
     }
     
 
@@ -389,7 +390,7 @@ void modalSynthesis_tilde_setup(void)
     class_addbang(modalSynthesis_class, modalSynthesis_bang);
     class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setF0, gensym("setF0"), A_GIMME, 0);
     class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setA, gensym("setA"), A_GIMME, 0);
-    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setA, gensym("setT60"), A_GIMME, 0);
+    class_addmethod(modalSynthesis_class, (t_method)modalSynthesis_setT60, gensym("setT60"), A_GIMME, 0);
 
 }
 
