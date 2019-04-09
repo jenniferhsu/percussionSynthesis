@@ -28,12 +28,6 @@ typedef struct _modalSynthesis
 {
     t_object x_obj;     /* obligatory header */
     t_float x_f0;       /* modal frequency */
-    // t_float x_ThetaS;   /* instantaneous phase for sine function */
-    // t_float x_ThetaC;   /* instantaneous phase for cos function */
-    // t_float x_A;        /* initial amplitude */
-    // t_float x_T60;       desired T60 time for amplitude envelope 
-    // t_float x_einc;     /* envelope wavetable increment */
-    // t_float x_eind;     /* envelope index */
 
     // arrays for multiple sinusoids
     t_float * x_f;      /* list of modal/fundamental frequencies (length = Nf) */
@@ -100,41 +94,8 @@ static t_int *modalSynthesis_perform(t_int *w)
         im = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
         */
         
-        /* calculate cosine value using wavetable */
-        // for cosine, we need to do cos = sin(pi/2 - Theta)
-        /*
-        index = x->x_ThetaC * WAVETABLE_LENGTH_OVER_TWO_PI;
-        i0 = trunc(index);
-        frac = index - i0;
-        i1 = i0 + 1.0f;
-        if(i1 > WAVETABLE_LENGTH)
-            i1 = 0;
-        re = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
-        */
 
-        /* calculate exponentially decaying envelope value using the wavetable */
-        /*
-        if(x->x_eind >= ENV_WAVETABLE_LENGTH) {
-            envVal = 0.0f;
-            x->x_eind = ENV_WAVETABLE_LENGTH-2;
-        } else {
-            i0 = trunc(x->x_eind);
-            frac = x->x_eind - i0;
-            i1 = i0 + 1.0f;
-            if(i1 > ENV_WAVETABLE_LENGTH)
-                i1 = ENV_WAVETABLE_LENGTH-1;
-            envVal = ((1.0f - frac) * x->x_decayExpWavetable[(int)i0]) + (frac * x->x_decayExpWavetable[(int)i1]);
-            x->x_eind += x->x_einc;
-        }
-
-
-        sample = x->x_A * envVal * re;
-        */
-        //sample = x->x_A * re;
-        //sample = re;
-
-
-        /* trying out an array of frequencies */
+        /* for an array of frequencies */
         sample = 0.0f;
         for(f = 0; f < x->x_N; f++) {
             /* calculate cosine value using wavetable */
