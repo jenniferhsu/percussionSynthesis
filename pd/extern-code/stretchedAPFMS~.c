@@ -13,6 +13,14 @@
 #define ENV_WAVETABLE_LENGTH 2048          // envelope wavetable length
 #define ENV_WAVETABLE_T60N 1536             // envelope wavetable T60 in samples
 
+/* NOTES */
+/*
+1. we don't need both x_ThetaS and x_ThetaC, we can just keep track of x_Theta for
+ a sine wave and use x->x_ThetaC = M_PI_2 - x->x_ThetaS; to find the theta for cosine
+ (this isn't a big deal though)
+2. build a table for atan: or if it's slow, use a taylor series approximation
+*/
+
 
 /* tilde object to take absolute value. */
 
@@ -56,6 +64,7 @@ static t_int *stretchedAPFMS_perform(t_int *w)
     float sinTheta, cosTheta;
     float angleH = 0.0f;
     float realH = 0.0f;
+    float envVal = 0.0f;
     //float samplePeriod = x->x_sr * (1.0f/x->x_f0);
     for(i = 0; i < bufferSize; i++)
     {
@@ -79,10 +88,40 @@ static t_int *stretchedAPFMS_perform(t_int *w)
         cosTheta = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
 
         angleH = x->x_ThetaS - (2.0f * atan(x->x_b0 * sinTheta / (1.0f + x->x_b0 * cosTheta)));
-        realH = cos(angleH);
+        //realH = cos(angleH);
 
-        // output sample (use the real value)
-        *(out + i) = realH;
+        /* find cos(angleH) to get the real(H) */
+        angleH = fmod(angleH, TWO_PI);
+        angleH = M_PI_2 - angleH;   // for cos
+        while(angleH < 0)
+            angleH += TWO_PI;
+        while(angleH >= TWO_PI)
+            angleH -= TWO_PI;
+        index = angleH * WAVETABLE_LENGTH_OVER_TWO_PI;
+        i0 = trunc(index);
+        frac = index - i0;
+        i1 = i0 + 1.0f;
+        if(i1 > WAVETABLE_LENGTH)
+            i1 = 0;
+        realH = ((1.0f - frac) * x->x_sinWavetable[(int)i0]) + (frac * x->x_sinWavetable[(int)i1]);
+
+        /* calculate exponentially decaying envelope value using the wavetable */
+        if(x->x_eind >= ENV_WAVETABLE_LENGTH) {
+            envVal = 0.0f;
+            x->x_eind = ENV_WAVETABLE_LENGTH-2;
+        } else {
+            i0 = trunc(x->x_eind);
+            frac = x->x_eind - i0;
+            i1 = i0 + 1.0f;
+            if(i1 > ENV_WAVETABLE_LENGTH)
+                i1 = ENV_WAVETABLE_LENGTH-1;
+            envVal = ((1.0f - frac) * x->x_decayExpWavetable[(int)i0]) + (frac * x->x_decayExpWavetable[(int)i1]);
+            x->x_eind += x->x_einc;
+        }
+
+        // output sample 
+        *(out + i) = x->x_A * envVal * realH;
+        //*(out + i) = realH;
 
         // increment offset and wrap Theta variables
         x->x_ThetaS += offset;
