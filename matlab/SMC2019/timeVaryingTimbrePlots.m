@@ -66,15 +66,15 @@ if plotSMCFigures==1
     figure
     subplot(311)
     spectrogram(real(ySAPFModal_static), hann(256), 128, 1024, fs, 'yaxis');
-    title('MS using H_i(n) oscillators, static timbre, b_0=-0.6312')
+    title('MS using z_{0,i}(n) oscillators, static timbre, b_0=-0.6312')
     set(gca,'FontSize',14)
     subplot(312)
     spectrogram(real(ySAPFModal_tv), hann(256), 128, 1024, fs, 'yaxis');
-    title('MS using H_i(n) oscillators, time-varying timbre, b(n)')
+    title('MS using z_{0,i}(n) oscillators, time-varying timbre, b_0(n)')
     set(gca,'FontSize',14)
     subplot(313)
     spectrogram(real(yFBFMModal_tv), hann(256), 128, 1024, fs, 'yaxis');
-    title('MS using z_i(n) oscillators, time-varying timbre, B(n)')
+    title('MS using z_{c,i}(n) oscillators, time-varying timbre, B(n)')
     set(gca,'FontSize',14)
     if saveSMCFigures==1
         fig = gcf;
