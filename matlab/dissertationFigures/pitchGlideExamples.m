@@ -51,12 +51,12 @@ for i=2:N
     yLin(i) = exp(j*wc*T*(1 + BTilde(i) * real(yLin(i-1)))) * yLin(i-1);
 end
 
-%% STRETCHED APF LINEAR INCREASE
+%% CLOSED FORM LOOPBACK FM LINEAR INCREASE
 
-% ThetaH = integral[2*pi * (m*nT + b) dnT]
-ThetaH = 2*pi * (m/2 * nT.^2 + b*nT);
+% Theta0 = integral[2*pi * (m*nT + b) dnT]
+Theta0 = 2*pi * (m/2 * nT.^2 + b*nT);
 b0 = (sqrt(1 - B^2) - 1)/B;
-YLin = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
+YLin = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 
 %% linearly increasing pitch glide plots
@@ -66,26 +66,26 @@ figure
 subplot(211)
 spectrogram(real(yLin), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Lin/1000, 'r')
+plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('loopback FM - pitch glide increasing linearly');
+title('Pitch glide increasing linearly with z_c(n)');
 colorbar('off')
 
 subplot(212)
 spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Lin/1000, 'r')
+plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('stretched APF - pitch glide increasing linearly');
+title('Pitch glide increasing linearly with z_0(n)');
 colorbar('off')
 
 if savePlots
     H = figure
     spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
-    plot(n*T*1000, f0Lin/1000, 'r')
+    plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
     ylim([0 1])
-    title('stretched APF - linearly increasing pitch glide');
+    title('Pitch glide increasing linearly with z_0(n)');
     set(gca, 'fontsize', 15)
     fig = H
     fig.PaperUnits = 'inches';
@@ -135,13 +135,13 @@ end
 
 %soundsc(real(yDec) .* env, fs)
 
-%% STRETCHED APF EXPONENTIAL DECAY
+%% CLOSED FORM LOOPBACK FM EXPONENTIAL DECAY
 
-% ThetaH = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
-ThetaH = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
+% Theta0 = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
+Theta0 = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
 
 b0 = (sqrt(1 - B^2) - 1)/B;
-YExp = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
+YExp = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 %% decaying pitch glide plots
 
@@ -150,25 +150,25 @@ figure
 subplot(211)
 spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Exp/1000, 'r')
+plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('loopback FM - exponentially decaying pitch glide');
+title('Pitch glide decreasing exponentially with z_c(n)');
 
 subplot(212)
 spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Exp/1000, 'r')
+plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('stretched APF - exponentially decaying pitch glide');
+title('Pitch glide decreasing exponentially with z_0(n)');
 
 if savePlots
     H = figure
     spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
-    plot(n*T*1000, f0Exp/1000, 'r')
+    plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
     ylim([0 1])
     colorbar('off')
-    title('stretched APF - exponentially decaying pitch glide');
+    title('Pitch glide decreasing exponentially with z_0(n)');
     set(gca, 'fontsize', 15)
     fig = H
     fig.PaperUnits = 'inches';
@@ -202,7 +202,7 @@ plot([0 decayT60], [f0_1 f0_1], 'k--')
 % we need to make sure the w0 <= wc. w0Tilde(N-1) will always be the largest
 % value since this is an increasing square-root function. We can use
 % w0Tilde(N-1) and a user-given B to solve for wc.
-w0Tilde = 2*pi*f0Inc;
+w0Tilde = 2*pi*f0Sqrt;
 wc = w0Tilde(N-1)/sqrt(1 - B^2);
 BTilde = sqrt(1 - (w0Tilde/wc).^2);
 
@@ -214,10 +214,10 @@ end
 
 %% STRETCHED APF SQUAREROOT INCREASE
 
-% ThetaH = integral[2*pi * (a*sqrt(nT) + c) dnT]
-ThetaH = 2*pi * ((2/3) * a * (nT.^(3/2)) + c*nT);
+% Theta0 = integral[2*pi * (a*sqrt(nT) + c) dnT]
+Theta0 = 2*pi * ((2/3) * a * (nT.^(3/2)) + c*nT);
 b0 = (sqrt(1 - B^2) - 1)/B;
-YSqrt = (b0 + exp(1j.*ThetaH)) ./ (1 + b0.*exp(1j.*ThetaH));
+YSqrt = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 
 %% SQUAREROOT INCREASING PITCH GLIDE
@@ -227,27 +227,27 @@ figure
 subplot(211)
 spectrogram(real(ySqrt), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Sqrt/1000, 'r')
+plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('loopback FM - pitch glide increasing with square root function');
+title('Pitch glide increasing by a square root function with z_c(n)');
 colorbar('off')
 
 subplot(212)
 spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
 hold on
-plot(n*T*1000, f0Sqrt/1000, 'r')
+plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
 ylim([0 1])
-title('stretched APF - pitch glide increasing with square root function');
+title('Pitch glide increasing by a square root function with z_0(n)');
 colorbar('off')
 
 if savePlots
     H = figure
     spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
-    plot(n*T*1000, f0Sqrt/1000, 'r')
+    plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
     ylim([0 1])
     colorbar('off')
-    title('stretched APF - squareroot increasing pitch glide');
+    title('Pitch glide increasing by a square root function with z_0(n)');
     set(gca, 'fontsize', 15)
     fig = gcf
     fig.PaperUnits = 'inches';

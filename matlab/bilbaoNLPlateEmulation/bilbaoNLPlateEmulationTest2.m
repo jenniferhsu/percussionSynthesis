@@ -242,6 +242,31 @@ end
 
 
 
+
+
+%% LET'S REDO THAT USING THE CLOSED FORM SOLUTION AND HAVING b0 VARY OVER 
+% TIME SO THAT THE HIGHER COMPONENTS OME IN LATER
+b0 = linspace(0.3, 0.5, N);
+z0TV = zeros(NfNL, N);
+z0 = zeros(1, N);
+for f=1:Nf
+    if f0V(f) > f0VEnd(f)
+        Theta0 = (2 * pi * (f0V(f) - f0VEnd(f))) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0VEnd(f) * nT); 
+    else
+        Theta0 = (2 * pi * (f0VEnd(f) - f0V(f))) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0V(f) * nT); 
+    end
+    z0TV(f,:) = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
+    z0 = z0 + real(z0TV(f,:)) .* envNL1(NLInds(f),:);
+end
+
+figure
+subplot(211)
+spectrogram(yNL, hann(256), 128, 1024, fs, 'yaxis');
+title('Bilbaos nonlinear plate');
+subplot(212)
+spectrogram(real(z0), hann(256), 128, 1024, fs, 'yaxis');
+title('closed form version')
+
 %% Let's see if we can find any modulation frequencies that are common in 
 % the nonlinear frequencies list
 diffMat = zeros(NfNL, NfNL);

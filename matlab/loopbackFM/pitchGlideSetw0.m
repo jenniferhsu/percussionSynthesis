@@ -38,7 +38,7 @@ w0Tilde = 2*pi*f0Tilde;%w0 * exp(-n./tau);
 wc = w0/sqrt(1 - B^2);
 BTilde = sqrt(1 - (w0Tilde/wc).^2);
 
-yExp = zeros(1, N);
+z = zeros(1, N);
 yExp(1) = 1;
 for i=2:N
     yExp(i) = exp(j*wc*T*(1 + BTilde(i) * real(yExp(i-1)))) * yExp(i-1);
