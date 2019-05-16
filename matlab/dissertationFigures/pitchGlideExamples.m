@@ -13,7 +13,8 @@ plotOutDir = 'figures/';
 fs = 44100;
 dur = 0.9;
 decayT60 = 0.6;     % time i want the pitch glide envelope to be at -60dB
-B = 0.5;           % timbre control
+b0 = -0.3;        % timbre control
+B = -2*b0 /(b0^2 + 1); 
 
 % derived parameters
 N = dur*fs;
@@ -55,7 +56,6 @@ end
 
 % Theta0 = integral[2*pi * (m*nT + b) dnT]
 Theta0 = 2*pi * (m/2 * nT.^2 + b*nT);
-b0 = (sqrt(1 - B^2) - 1)/B;
 YLin = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 
@@ -81,23 +81,31 @@ colorbar('off')
 
 if savePlots
     H = figure
+    subplot(211)
     spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
     plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
-    ylim([0 1])
+    ylim([0 2])
     title('Pitch glide increasing linearly with z_0(n)');
     set(gca, 'fontsize', 15)
-    fig = H
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 6 2.6];
-    print([plotOutDir 'pitchGlideLinIncrease'], '-depsc', '-r0')
+    subplot(212)
+    spectrogram(real(yLin), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
+    ylim([0 2])
+    title('Pitch glide increasing linearly with z_c(n)');
+    set(gca, 'fontsize', 15)
+    saveas(gcf, [plotOutDir 'pitchGlideLinIncrease'], 'epsc')
+%     fig = H
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0 0 6 2.6];
+%     print([plotOutDir 'pitchGlideLinIncrease'], '-depsc', '-r0')
     %close
 end
 
 
 
 %% EXPONENTIAL DECAY
-
 
 f0_0 = 840;         % starting frequency, Hz
 f0_1 = 140;          % ending frequency, Hz
@@ -140,7 +148,7 @@ end
 % Theta0 = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
 Theta0 = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
 
-b0 = (sqrt(1 - B^2) - 1)/B;
+%b0 = (sqrt(1 - B^2) - 1)/B;
 YExp = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 %% decaying pitch glide plots
@@ -163,17 +171,27 @@ title('Pitch glide decreasing exponentially with z_0(n)');
 
 if savePlots
     H = figure
+    subplot(211)
     spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
     plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
-    ylim([0 1])
+    ylim([0 2])
     colorbar('off')
     title('Pitch glide decreasing exponentially with z_0(n)');
     set(gca, 'fontsize', 15)
-    fig = H
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 6 2.6];
-    print([plotOutDir 'pitchGlideExpDecay'], '-depsc', '-r0')
+    subplot(212)
+    spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
+    ylim([0 2])
+    colorbar('off')
+    title('Pitch glide decreasing exponentially with z_c(n)');
+    set(gca, 'fontsize', 15)
+    saveas(gcf, [plotOutDir 'pitchGlideExpDecay'], 'epsc')
+%     fig = H
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0 0 6 2.6];
+%     print([plotOutDir 'pitchGlideExpDecay'], '-depsc', '-r0')
     %close
 end
 
@@ -216,7 +234,7 @@ end
 
 % Theta0 = integral[2*pi * (a*sqrt(nT) + c) dnT]
 Theta0 = 2*pi * ((2/3) * a * (nT.^(3/2)) + c*nT);
-b0 = (sqrt(1 - B^2) - 1)/B;
+%b0 = (sqrt(1 - B^2) - 1)/B;
 YSqrt = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 
@@ -242,17 +260,28 @@ colorbar('off')
 
 if savePlots
     H = figure
+    subplot(211)
     spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
     plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
-    ylim([0 1])
+    ylim([0 3])
     colorbar('off')
     title('Pitch glide increasing by a square root function with z_0(n)');
     set(gca, 'fontsize', 15)
-    fig = gcf
-    fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 6 2.6];
-    print([plotOutDir 'pitchGlideSqrtIncrease'], '-depsc', '-r0')
+    
+    subplot(212)
+    spectrogram(real(ySqrt), hann(1024), 512, 2048, fs, 'yaxis')
+    hold on
+    plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
+    ylim([0 3])
+    colorbar('off')
+    title('Pitch glide increasing by a square root function with z_c(n)');
+    set(gca, 'fontsize', 15)
+    saveas(H, [plotOutDir 'pitchGlideSqrtIncrease'], 'epsc')
+%     fig = gcf
+%     fig.PaperUnits = 'inches';
+%     fig.PaperPosition = [0 0 6 2.6];
+%     print([plotOutDir 'pitchGlideSqrtIncrease'], '-depsc', '-r0')
     %close
 end
 
