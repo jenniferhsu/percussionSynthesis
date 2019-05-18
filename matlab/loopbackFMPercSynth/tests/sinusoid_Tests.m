@@ -1,5 +1,4 @@
-% loopbackFMz0_Tests.m: tests for loopbackFMz0.m file
-%loopbackFMz0(f0, f0End, pitchGlideType, b0, dur, fs, varargin);
+% sinusoid_Tests.m: tests for sinusoid.m file
 
 addpath(genpath('../'));
 

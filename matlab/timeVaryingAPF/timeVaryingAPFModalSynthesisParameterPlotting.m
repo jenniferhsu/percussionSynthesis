@@ -12,7 +12,7 @@ addpath(genpath('../proofOfConcept'));
 fs = 44100;
 dur = 1;
 plotFigures = 1;
-saveFigures = 0;
+saveFigures = 1;
 
 saveDir = 'figures/';
 if ~exist(saveDir, 'dir')
@@ -97,7 +97,7 @@ if plotFigures == 1
         title(sprintf('M=%1.f', MVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF modal synthesis for different M values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different M values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -137,7 +137,7 @@ if plotFigures == 1
         title(sprintf('f_m=%1.f', fmVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF modal synthesis for different f_m values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different f_m values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -180,7 +180,7 @@ if plotFigures == 1
         ylim([0 8])
         title(sprintf('f_b=%1.f', fbVec(b)))
     end
-    sgtitle('spectrogram of time-varying APF modal synthesis for different f_b values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different f_b values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
