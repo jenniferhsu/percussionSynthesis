@@ -1,5 +1,8 @@
 % Chapter4Plots.m
 % This script plots all the figures from Chapter 4.
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 addpath(genpath('loopbackFMPercSynth/'));
 savePlots = 1;

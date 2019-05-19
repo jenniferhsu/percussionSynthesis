@@ -14,6 +14,9 @@ function yApf = timeVaryingAPF2(x, f_pi, f_b, M, f_m, fs)
 %
 % output:
 %   yApf: the output signal of the same size as input x
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 N = length(x);
 nT = (0:(N-1))/fs;

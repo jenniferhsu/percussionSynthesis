@@ -1,4 +1,4 @@
-% loopbackFMMS_Tests.m tests for loopbackFMMS.m file
+% applyCommutedSynthesis_Tests.m tests for applyCommutedSynthesis.m file
 %
 % author: Jennifer Hsu
 % date: Spring 2019
@@ -29,7 +29,15 @@ argStruct.sinusoidArgs.f0EndVec = [70, 1250, 2110, 4300, 5550];
 argStruct.sinusoidArgs.pitchGlideTypeVec = {'lin', 'exp', 'lin', 'exp', 'lin'};
 argStruct.sinusoidArgs.zcArgsVec = [0, 0, 0, 0, 0];
 
+% loopback FM MS
 [ms, msMat] = loopbackFMMS('s', env, argStruct, fs);
+
+% commuted synthesis
+resIRWav = '../resonatorIRs/taiko/taiko2.wav';
+excitationType = 'rc';
+excitationParams = struct();
+excitationParams.winLength = 16;
+ys = applyCommutedSynthesis(ms, resIRWav, excitationType, excitationParams, fs);
 
 
 %% loopback FM zc MS
@@ -40,7 +48,17 @@ argStruct.zcArgs.BEndVec = [0.5 0.4 0.3 0.2 0.0];
 argStruct.zcArgs.gVec = [0.9999, 0.999, 0, 0.99, 0];
 argStruct.zcArgs.BGlideType = {'expB', 'expB', 'linB', 'expB', 'linB'};
 
+% loopback FM MS
 [mzc, mzcMat] = loopbackFMMS('zc', env, argStruct, fs);
+
+% commuted synthesis
+resIRWav = '../resonatorIRs/beduk/beduk4.wav';
+excitationType = 'nb';
+excitationParams = struct();
+excitationParams.durNB = 0.001;
+excitationParams.lowFreq = 200;
+excitationParams.highFreq = 2000;
+yzc = applyCommutedSynthesis(mzc, resIRWav, excitationType, excitationParams, fs);
 
 %% loopback FM z0 MS
 argStruct.z0Args = struct();
@@ -53,27 +71,39 @@ end
 for f=1:Nf
     argStruct.z0Args.zcArgsVec(f) = struct();
 end
+argStruct.z0Args.zcArgsVec(1).T60 = 0.9;
 argStruct.z0Args.zcArgsVec(4).B = 0.999;
 argStruct.z0Args.zcArgsVec(4).BEnd = 0.5;
 argStruct.z0Args.zcArgsVec(4).wc = 2*pi*2000;
 argStruct.z0Args.zcArgsVec(5).g = 0.9999;
 argStruct.z0Args.zcArgsVec(5).wc = 2*pi*1000;
 
+% loopback FM MS
 [mz0, mz0Mat] = loopbackFMMS('z0', env, argStruct, fs);
+
+% commuted synthesis
+resIRWav = '../resonatorIRs/taiko/taiko1.wav';
+excitationType = 'nb';
+excitationParams = struct();
+excitationParams.durNB = 0.08;
+excitationParams.lowFreq = 100;
+excitationParams.highFreq = 12000;
+yz0 = applyCommutedSynthesis(mz0, resIRWav, excitationType, excitationParams, fs);
+
 
 %% plots
 
 figure
-spectrogram(real(ms), hann(256), 128, 1024, fs, 'yaxis');
-title('traditional MS')
+spectrogram(real(ys), hann(256), 128, 1024, fs, 'yaxis');
+title('traditional MS with commuted synthesis')
 ylim([0 18])
 
 figure
-spectrogram(real(mzc), hann(256), 128, 1024, fs, 'yaxis');
-title('loopback FM (zc) MS')
+spectrogram(real(yzc), hann(256), 128, 1024, fs, 'yaxis');
+title('loopback FM (zc) MS with commuted synthesis')
 ylim([0 18])
 
 figure
-spectrogram(real(mz0), hann(256), 128, 1024, fs, 'yaxis');
-title('loopback FM (z0) MS')
+spectrogram(real(yz0), hann(256), 128, 1024, fs, 'yaxis');
+title('loopback FM (z0) MS with commuted synthesis')
 ylim([0 18])

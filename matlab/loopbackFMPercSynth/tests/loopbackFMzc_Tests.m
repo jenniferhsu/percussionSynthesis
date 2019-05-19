@@ -1,4 +1,7 @@
 % loopbackFMzc_Tests.m: tests for loopbackFMzc.m file
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 addpath(genpath('../'));
 

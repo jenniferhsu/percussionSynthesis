@@ -1,4 +1,7 @@
 % applyTimeVaryingAPF2_Tests.m tests for loopbackFMMS.m file
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 addpath(genpath('../'));
 fs = 44100;

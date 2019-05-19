@@ -19,6 +19,9 @@ function [y, yMat] = applyTimeVaryingAPF2(mMat, env, fs, TVAPFParams)
 %       allpassed loopback FM oscillators before enveloping
 %
 % see tests/applyTimeVaryingAPF2_Tests.m for examples
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 Nf = size(mMat, 1);
 N = size(mMat, 2);

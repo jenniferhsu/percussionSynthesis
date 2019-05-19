@@ -1,5 +1,8 @@
 % envMat_Tests.m: tests that envMat.m is creating the correct amplitude
 % envelopes
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 e0Vec = [1, 0.9, 0.8, 0.7 0.6]';
 T60Vec = [0.9, 0.8, 0.7, 0.6, 0.5]';

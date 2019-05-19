@@ -1,5 +1,8 @@
 % loopbackFMz0_Tests.m: tests for loopbackFMz0.m file
 %loopbackFMz0(f0, f0End, pitchGlideType, b0, dur, fs, varargin);
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 addpath(genpath('../'));
 

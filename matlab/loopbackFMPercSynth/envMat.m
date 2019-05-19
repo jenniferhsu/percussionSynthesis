@@ -17,6 +17,9 @@ function env = envMat(e0Vec, T60Vec, dur, fs)
 % e0Vec = [1, 0.9, 0.89, 0.8, 0.75]';
 % T60Vec = [0.9, 0.88, 0.87, 0.85, 0.77]';
 % env = envMat(e0Vec, T60Vec, dur, fs);
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 N = dur*fs;
 Nf = length(e0Vec);

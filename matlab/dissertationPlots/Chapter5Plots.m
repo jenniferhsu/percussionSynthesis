@@ -1,5 +1,8 @@
 % Chapter5Plots.m
 % This script plots all the figures from Chapter 5.
+%
+% author: Jennifer Hsu
+% date: Spring 2019
 
 addpath(genpath('../loopbackFMPercSynth/'));
 addpath(genpath('../helperFunctions/'));
