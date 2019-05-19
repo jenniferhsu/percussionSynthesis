@@ -44,9 +44,8 @@ elseif strcmp(excitationType, 'nb')
 
     % calculate noise burst
     sampNB = ceil(durNB*fs);
-    excitation(1:sampNB) = 2*rand(1, sampNB) - 1;%[(2*rand(1, sampNB))-1 zeros(1, N-sampNB)]';
-
-    [B, A] = butter(5, [lowFreq/(fs/2) highFreq/(fs/2)], 'bandpass');
+    excitation(1:sampNB) = 2*rand(1, sampNB) - 1;
+    [B, A] = butter(2, [lowFreq/(fs/2) highFreq/(fs/2)], 'bandpass');
     %freqz(B,A)
     excitation = filter(B, A, excitation);
 
@@ -93,4 +92,5 @@ end
 Y = AE.*M;
 y = real(ifft(Y, Nfft));
 
-y = y(1:N);
+% cut the output signal to get the tail
+y = y(1:max(length(resIR), N));

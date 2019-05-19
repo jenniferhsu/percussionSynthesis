@@ -75,7 +75,7 @@ end
 
 % save audio
 if saveAudio
-    audiowrite([audioDir filePrefix 'kickStaticPitchAndTimbre' '.wav'], ...
+    audiowrite([audioDir 'hsu_kick_staticPitchAndTimbre' '.wav'], ...
                 scaleForSavingAudio(real(kick0)), fs);
 end
 
@@ -214,9 +214,9 @@ end
 
 % save audio
 if saveAudio
-    audiowrite([audioDir filePrefix 'kickPitchGlidez0' '.wav'], ...
+    audiowrite([audioDir 'hsu_kick_pitchGlidez0' '.wav'], ...
                 scaleForSavingAudio(real(kick1)), fs);
-    audiowrite([audioDir filePrefix 'kickPitchGlidezc' '.wav'], ...
+    audiowrite([audioDir 'hsu_kick_pitchGlidezc' '.wav'], ...
                 scaleForSavingAudio(real(kick1c)), fs);
 end
 
@@ -273,7 +273,7 @@ if savePlots
 end
 
 if saveAudio
-    audiowrite([audioDir filePrefix 'kickPitchGlideAndTimbrez0' '.wav'], ...
+    audiowrite([audioDir 'hsu_kick_pitchAndTimbreVariation' '.wav'], ...
                 scaleForSavingAudio(real(kick2)), fs);
 end
 
@@ -336,6 +336,183 @@ if savePlots
 end
 
 if saveAudio
-    audiowrite([audioDir filePrefix 'kickTimeVaryingAPF' '.wav'], ...
+    audiowrite([audioDir 'hsu_kick_timeVaryingAPF' '.wav'], ...
                 scaleForSavingAudio(real(kick3)), fs);
+end
+
+%% Figure 5.7
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Kick Drum / Applying Commuted Synthesis
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+resIRWav = '../loopbackFMPercSynth/resonatorIRs/taiko/taiko2_fixedOffset.wav';
+excitationType = 'rc';
+excitationParams = struct();
+excitationParams.winLength = 4;
+kick4 = applyCommutedSynthesis(kick3, resIRWav, excitationType, excitationParams, fs);
+
+% plot
+figure
+spectrogram(real(kick4), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off');
+title('z_{0,0}(n) kick drum with commuted synthesis');
+ylim([0 1])
+set(gca, 'FontSize', 15);
+if savePlots
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 2.5];
+    saveas(gcf, [figDir filePrefix 'kickCommutedSynthesis'], 'epsc')
+end
+
+if saveAudio
+    audiowrite([audioDir 'hsu_kick_commutedSynthesis' '.wav'], ...
+                scaleForSavingAudio(real(kick3)), fs);
+end
+
+%% Figure 5.8
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Snare Drum 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+fs = 44100;
+dur = 1.0;
+
+% === snare - set up argument struct ===
+argStruct = struct();
+argStruct.sinusoidArgs = struct();
+argStruct.zcArgs = struct();
+argStruct.z0Args = struct();
+
+% === snare - set up envelope ===
+e0Vec = [1, 0.2]';
+T60Vec = [0.6, 0.5]';
+env = envMat(e0Vec, T60Vec, dur, fs);
+wg = env(1,:)';  % global amplitude envelope
+
+Nf = length(e0Vec);
+N = dur*fs;
+
+% === snare synthesis - loopback FM parameters ===
+
+% traditional MS parameters
+argStruct.sinusoidArgs.f0Vec = [185, 330];
+argStruct.sinusoidArgs.f0EndVec = [185, 330];
+argStruct.sinusoidArgs.pitchGlideTypeVec = {'none', 'none'};
+argStruct.sinusoidArgs.zcArgsVec = [0, 0];
+
+% loopback FM z0 parameters
+argStruct.z0Args = struct();
+argStruct.z0Args.f0Vec = [185, 330];
+argStruct.z0Args.f0EndVec = [140, 280];
+argStruct.z0Args.pitchGlideTypeVec = {'exp', 'exp'};
+for f=1:Nf
+    argStruct.z0Args.b0Mat(f,:) = linspace(0.999*((Nf-(f-1))/Nf), 0.001, N);
+    argStruct.z0Args.b0Mat(f,:) = ones(1,N) * 0.5;
+end
+for f=1:Nf
+    argStruct.z0Args.zcArgsVec(f) = struct();
+end
+argStruct.z0Args.zcArgsVec(1).T60 = 0.6;
+argStruct.z0Args.zcArgsVec(2).T60 = 0.6;
+
+% === snare synthesis ===
+
+% snare - traditional MS
+[snare_s, snare_s_Mat] = loopbackFMMS('s', env, argStruct, fs);
+
+% snare - loopback FM z0
+[snare_z0, snare_z0_Mat] = loopbackFMMS('z0', env, argStruct, fs);
+
+% === time-varying allpass filter ===
+
+TVAPFParams.fpiVec = argStruct.sinusoidArgs.f0Vec;
+TVAPFParams.fbVec = [100 200];
+TVAPFParams.MVec = [1000 250];
+TVAPFParams.fmVec = [300 2000];
+
+% time-varying APF - traditional MS
+[ySnare_s, ySnare_s_Mat] = applyTimeVaryingAPF2(snare_s_Mat, env, fs, TVAPFParams);
+
+% time-varying APF - loopback FM z0
+[ySnare_z0, ySnare_z0_Mat] = applyTimeVaryingAPF2(snare_z0_Mat, env, fs, TVAPFParams);
+
+% === commuted synthesis ===
+
+% commuted synthesis parameters
+resIRWav = '../loopbackFMPercSynth/resonatorIRs/impulse.wav';
+excitationType = 'nb';
+excitationParams = struct();
+excitationParams.durNB = 0.6;
+excitationParams.lowFreq = 120;
+excitationParams.highFreq = 8000;
+
+% snare - traditional MS commuted synthesis
+snare_s_CS = applyCommutedSynthesis(real(snare_s), resIRWav, excitationType, excitationParams, fs);
+snare_s_CS = snare_s_CS .* wg;
+
+% snare - loopback FM z0 commuted synthesis
+snare_z0_CS = applyCommutedSynthesis(real(snare_z0), resIRWav, excitationType, excitationParams, fs);
+snare_z0_CS = snare_z0_CS .* wg;
+
+% snare - traditional MS with time-varying APF - commuted synthesis
+ySnare_s_CS = applyCommutedSynthesis(real(ySnare_s), resIRWav, excitationType, excitationParams, fs);
+ySnare_s_CS = ySnare_s_CS .* wg;
+
+% snare - loopback FM z0 with time-varying APF - commuted synthesis
+ySnare_z0_CS = applyCommutedSynthesis(real(ySnare_z0), resIRWav, excitationType, excitationParams, fs);
+ySnare_z0_CS = ySnare_z0_CS .* wg;
+
+% === plot ===
+figure
+subplot(411)
+spectrogram(real(snare_s_CS), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off');
+title('Traditional MS');
+xlim([0 600])
+ylim([0 10])
+set(gca, 'FontSize', 15);
+
+subplot(412)
+spectrogram(real(snare_z0_CS), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off');
+title('Loopback FM MS');
+xlim([0 600])
+ylim([0 10])
+set(gca, 'FontSize', 15);
+
+subplot(413)
+spectrogram(real(ySnare_s_CS), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off');
+title('Traditional MS with time-varying allpass filters');
+xlim([0 600])
+ylim([0 10])
+set(gca, 'FontSize', 15);
+
+subplot(414)
+spectrogram(real(ySnare_z0_CS), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off');
+title('Loopback FM MS with time-varying allpass filters');
+xlim([0 600])
+ylim([0 10])
+set(gca, 'FontSize', 15);
+
+sgtitle('Snare drum synthesis example', 'FontSize', 15)
+
+if savePlots
+    fig = gcf;
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 9];
+    saveas(gcf, [figDir filePrefix 'snare'], 'epsc')
+end
+
+% save audio
+if saveAudio
+    audiowrite([audioDir 'hsu_snare_traditionalMS' '.wav'], ...
+                scaleForSavingAudio(real(snare_s_CS)), fs);
+    audiowrite([audioDir 'hsu_snare_loopbackFM' '.wav'], ...
+                scaleForSavingAudio(real(snare_z0_CS)), fs);
+    audiowrite([audioDir 'hsu_snare_traditionalMSTimeVaryingAPF' '.wav'], ...
+                scaleForSavingAudio(real(ySnare_s_CS)), fs);
+    audiowrite([audioDir 'hsu_snare_loopbackFMTimeVaryingAPF' '.wav'], ...
+                scaleForSavingAudio(real(ySnare_z0_CS)), fs);
 end
