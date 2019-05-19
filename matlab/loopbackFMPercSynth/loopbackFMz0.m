@@ -1,6 +1,6 @@
 function [z0, pitchGlide] = loopbackFMz0(f0, f0End, pitchGlideType, b0, dur, fs, varargin)
-%loopbackFMz0(f0, b0, dur, fs) generates a loopback FM signal using the 
-% closed form loopback FM equation:
+%%loopbackFMz0(f0, f0End, pitchGlideType, b0, dur, fs, varargin) generates 
+% a loopback FM signal using the closed form loopback FM equation:
 %   z_0(n) = (b0 + exp(j*w_0*n*T)) / (1 + b0 * exp(j*w_0*n*T))
 %
 % inputs:
@@ -20,7 +20,8 @@ function [z0, pitchGlide] = loopbackFMz0(f0, f0End, pitchGlideType, b0, dur, fs,
 %   dur: duration of sample in seconds
 %   fs: sampling rate in Hz
 %   varargin: optional structure that holds zc arguments for when 
-%       pitchGlideType is 'linB' or 'expB'
+%       pitchGlideType is 'exp', 'linB' or 'expB'
+%       if pitchGlideType is 'exp', varargin holds values for T60
 %       if pitchGlideType is 'linB', varargin holds values for
 %           B, BEnd, and wc
 %       if pitchGlideType is 'expB', varargin holds values for
@@ -54,8 +55,11 @@ elseif strcmp(pitchGlideType, 'lin')
     pitchGlide = k*n*T + l;
     Theta0 = 2*pi*((k*(n*T).^2)/2 + l*n*T);
 elseif strcmp(pitchGlideType, 'exp')
+    a = varargin{1};
+    T60 = a.T60;
+    n60 = T60*fs;
     tau_d = -N*T/log(0.001/1);
-    d = 1*exp(-n*T/tau_d);
+    d = 1*exp(-n60*T/tau_d);
     pitchGlide = (f0 - f0End)*d + f0End;
     Theta0 = -2*pi*(f0 - f0End)*tau_d*1*exp(-n*T/tau_d) + 2*pi*f0End*n*T;
 elseif strcmp(pitchGlideType, 'sqrt')

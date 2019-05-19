@@ -10,8 +10,10 @@ function [zc, pitchGlide] = loopbackFMzc(fc, B, BEnd, g, BGlideType, dur, fs)
 %   BEnd: loopback FM coefficient between -1 and 1
 %       ending B value if B is time-varying
 %   g: exponetial function bass if BGlideType is expB
-%   BGlideType: 'none', 'linB', or 'expB' 
+%   BGlideType: 'none', 'useB', 'linB', or 'expB' 
 %       if 'none': fc and B are used in the loopback FM equation
+%       if 'useB': the pitch glide is stored in B and nothing needs
+%           to be calculated
 %       if 'linB': fc, B, and BEnd are used for the time-variation
 %       if 'expB': fc and g used for the time-variation
 %   dur: duration of sample in seconds
@@ -41,7 +43,10 @@ if strcmp(BGlideType, 'none')
     pitchGlide = [];
 else
     % time-varying pitch and timbre
-    if strcmp(BGlideType, 'linB')  
+    if strcmp(BGlideType, 'useB')
+        BVec = B;
+        pitchGlide = fc*sqrt(1 - BVec.^2);
+    elseif strcmp(BGlideType, 'linB')  
         k = (BEnd - B)/N;
         l = B;
         BVec = k*nn + l;

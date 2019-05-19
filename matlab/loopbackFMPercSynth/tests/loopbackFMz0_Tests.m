@@ -56,7 +56,9 @@ f0End = 104;
 dur = 1;
 fs = 44100;
 b0 = 0.5;
-[z05 , pitchGlide5] = loopbackFMz0(f0, f0End, 'exp', b0, dur, fs);
+aStruct = struct();
+aStruct.T60 = 0.8;
+[z05 , pitchGlide5] = loopbackFMz0(f0, f0End, 'exp', b0, dur, fs, aStruct);
 
 
 %% time-varying pitch - sqrt, static timbre
