@@ -9,8 +9,8 @@ fs = 44100;
 N = 2*fs;
 
 synthExample = 'marimba';
-synthExample = 'tom tom';
-synthExample = 'circular plate';
+%synthExample = 'tom tom';
+%synthExample = 'circular plate';
 %synthExample = 'wood block';
 
 % Marimba example
@@ -20,6 +20,8 @@ if strcmp('marimba', synthExample) == 1
     yMSPGWav = 'audioExamples/marimba/V2/modalSynthesisPitchGlide.wav';
     resIRWav = '../proofOfConcept/resonatorIRs/marimbaTube.wav';
 end
+
+keyboard
 
 % Tom tom examples
 if strcmp('tom tom', synthExample) == 1

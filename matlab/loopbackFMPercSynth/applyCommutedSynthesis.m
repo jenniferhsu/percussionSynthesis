@@ -24,6 +24,10 @@ function y = applyCommutedSynthesis(yMS, resIRWav, excitationType, excitationPar
 N = length(yMS);
 excitation = zeros(N, 1);
 
+if size(yMS,2) ~= 1
+    yMS = yMS';
+end
+
 %% create the excitation
 if strcmp(excitationType, 'rc')
     % raised cosine/Hann window
@@ -64,7 +68,6 @@ N = length(excitation);
 [resIR, ~] = audioread(resIRWav);
 resIR = resIR(:,1);
 
-
 %% perform the convolutions
 
 % excitation convolved with resonating body to form aggregate excitation
@@ -78,16 +81,6 @@ er = ifft(ER, Nfft);
 Nfft = 2^nextpow2(length(er) + length(yMS) - 1);
 AE = fft(er, Nfft);
 M = fft(yMS, Nfft);
-
-if size(AE, 1) == 1
-    if size(M,1) ~= 1
-        M = M';
-    end
-elseif size(AE, 2) == 1
-    if size(M,2) ~= 1
-        M = M';
-    end
-end
 
 Y = AE.*M;
 y = real(ifft(Y, Nfft));

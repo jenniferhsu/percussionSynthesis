@@ -56,7 +56,14 @@ elseif strcmp(oscType, 'zc')
     BVec = argStruct.zcArgs.BVec;
     BEndVec = argStruct.zcArgs.BEndVec;
     gVec = argStruct.zcArgs.gVec;
-    BGlideTypeVec = argStruct.zcArgs.BGlideType;
+    BGlideTypeVec = argStruct.zcArgs.BGlideTypeVec;
+    BMat = zeros(Nf,N);
+    for f=1:Nf
+        if strcmp(BGlideTypeVec{f}, 'useB')
+            BMat = argStruct.zcArgs.BMat;
+            continue;
+        end
+    end
     
     for f=1:Nf
         fc = fcVec(f);
@@ -64,6 +71,11 @@ elseif strcmp(oscType, 'zc')
         BEnd = BEndVec(f);
         g = gVec(f);
         BGlideType = BGlideTypeVec(f);
+        % grab BVec from BMat if pitch glide is specified as a vector for B
+        if strcmp(BGlideTypeVec{f}, 'useB')
+            B = BMat(f,:);
+        end
+        
         [mMat(f,:), ~] = loopbackFMzc(fc, B, BEnd, g, BGlideType, dur, fs);
         m = m + (mMat(f,:) .* env(f,:));
     end
