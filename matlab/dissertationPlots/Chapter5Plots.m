@@ -1142,7 +1142,7 @@ argStruct.sinusoidArgs.zcArgsVec = zeros(1, Nf);
 
 % loopback FM zc parameters
 argStruct.zcArgs = struct();
-BVec = linspace(0.91, 0.9, N);
+BVec = linspace(0.99, 0.99, N);
 argStruct.zcArgs.BVec = BVec;
 argStruct.zcArgs.BMat = repmat(BVec, Nf,1);
 argStruct.zcArgs.BEndVec = zeros(1, Nf);
@@ -1156,10 +1156,10 @@ end
 
 % === circular plate synthesis - traditional MS and loopback FM MS ===
 
-% marimba - traditional MS
+% circular plate - traditional MS
 [circularPlate_s, circularPlate_s_Mat] = loopbackFMMS('s', env, argStruct, fs);
 
-% marimba - loopback FM z0
+% circular plate - loopback FM zc
 [circularPlate_zc, circularPlate_zc_Mat] = loopbackFMMS('zc', env, argStruct, fs);
 
 % === circular plate synthesis - time-varying APF ===
