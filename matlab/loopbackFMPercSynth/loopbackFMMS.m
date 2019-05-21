@@ -75,7 +75,6 @@ elseif strcmp(oscType, 'zc')
         if strcmp(BGlideTypeVec{f}, 'useB')
             B = BMat(f,:);
         end
-        
         [mMat(f,:), ~] = loopbackFMzc(fc, B, BEnd, g, BGlideType, dur, fs);
         m = m + (mMat(f,:) .* env(f,:));
     end

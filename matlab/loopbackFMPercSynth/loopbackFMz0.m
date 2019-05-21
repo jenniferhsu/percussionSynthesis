@@ -86,7 +86,7 @@ elseif strcmp(pitchGlideType, 'expB')
     BVec = g.^n;
     w0 = wc * sqrt(1 - BVec.^2);
     pitchGlide = w0/(2*pi);
-    Theta0 = wc*T/log(g) .* (sqrt(1 - g.^(2*n)) - atanh(1 - g.^(2*n)));
+    Theta0 = wc*T/log(g) .* (sqrt(1 - g.^(2*n)) - atanh(sqrt(1 - g.^(2*n))));
 end
 
 % the closed-form loopback FM calculation

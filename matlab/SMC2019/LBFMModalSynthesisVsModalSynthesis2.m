@@ -16,7 +16,7 @@ fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
 plotSMCFigures = 1;
-saveSMCFigures = 1;
+saveSMCFigures = 0;
 
 saveDir = 'figures/V2/';
 if ~exist(saveDir, 'dir')

@@ -15,7 +15,7 @@ fs = 44100;
 dur = 1;
 plotSpectrograms = 0;
 plotFigures = 1;
-saveFigures = 0;
+saveFigures = 1;
 
 saveDir = 'figures/';
 if ~exist(saveDir, 'dir')
@@ -228,11 +228,11 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS spectrogram, f_c=2000Hz')
+    title('Loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_low1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Time-varying APF of loopback FM MS spectrogram, f_c=2000Hz')
+    title('Time-varying APF of loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
         saveas(gcf, [saveDir 'loopbackFMVsTimeVaryingAPF_f_low'], 'epsc')
@@ -242,11 +242,11 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS with pitch glide spectrogram, f_c=2000Hz')
+    title('Loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_low2), hann(256), 128, 1024, fs, 'yaxis');
-    title('TV APF of loopback FM MS with pitch glide spectrogram, f_c=2000Hz')
+    title('TV APF of loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
         saveas(gcf, [saveDir 'loopbackFMVsTimeVaryingAPF_pitchGlide_f_low'], 'epsc')
@@ -256,11 +256,11 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS spectrogram, f_c=4000Hz')
+    title('Loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_high1), hann(256), 128, 1024, fs, 'yaxis');
-    title('Time-varying APF of loopback FM MS spectrogram, f_c=4000Hz')
+    title('Time-varying APF of loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
         saveas(gcf, [saveDir 'loopbackFMVsTimeVaryingAPF_f_high'], 'epsc')
@@ -270,11 +270,11 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high2), hann(256), 128, 1024, fs, 'yaxis');
-    title('Loopback FM MS with pitch glide spectrogram, f_c=4000Hz')
+    title('Loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_high2), hann(256), 128, 1024, fs, 'yaxis');
-    title('TV APF of loopback FM MS with pitch glide spectrogram, f_c=4000Hz')
+    title('TV APF of loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
         saveas(gcf, [saveDir 'loopbackFMVsTimeVaryingAPF_pitchGlide_f_high'], 'epsc')

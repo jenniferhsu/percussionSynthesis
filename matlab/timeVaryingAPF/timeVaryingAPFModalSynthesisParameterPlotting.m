@@ -89,15 +89,15 @@ for m=1:NM
 end
 
 if plotFigures == 1
-    figure
+    fig = figure
     for m=1:NM
         subplot(4, 2, m)
         spectrogram(real(yMSTVAPF_M(m,:)), hann(256), 128, 1024, fs, 'yaxis');
         colorbar('off')
-        title(sprintf('M=%1.f', MVec(m)), 'fontsize', 15)
+        title(sprintf('M_i=%1.f', MVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF MS for different M values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different M_i values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -134,10 +134,10 @@ if plotFigures == 1
         subplot(4, 2, m)
         spectrogram(real(yMSTVAPF_f_m(m,:)), hann(256), 128, 1024, fs, 'yaxis');
         colorbar('off')
-        title(sprintf('f_m=%1.f', fmVec(m)), 'fontsize', 15)
+        title(sprintf('f_{m,i}=%1.f', fmVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF MS for different f_m values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different f_{m,i} values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -178,9 +178,9 @@ if plotFigures == 1
         spectrogram(real(yMSTVAPF(b,:)), hann(256), 128, 1024, fs, 'yaxis');
         colorbar('off')
         ylim([0 8])
-        title(sprintf('f_b=%1.f', fbVec(b)))
+        title(sprintf('f_{b,i}=%1.f', fbVec(b)))
     end
-    sgtitle('spectrogram of time-varying APF MS for different f_b values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying APF MS for different f_{b,i} values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];

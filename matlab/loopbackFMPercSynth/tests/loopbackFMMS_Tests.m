@@ -38,7 +38,7 @@ argStruct.zcArgs.fcVec = [4700, 5772, 6366, 7967, 8948];
 argStruct.zcArgs.BVec = [0.99 0.96 0.95 0.8 0.5];
 argStruct.zcArgs.BEndVec = [0.5 0.4 0.3 0.2 0.0];
 argStruct.zcArgs.gVec = [0.9999, 0.999, 0, 0.99, 0];
-argStruct.zcArgs.BGlideType = {'expB', 'expB', 'linB', 'expB', 'linB'};
+argStruct.zcArgs.BGlideTypeVec = {'expB', 'expB', 'linB', 'expB', 'linB'};
 
 [mzc, mzcMat] = loopbackFMMS('zc', env, argStruct, fs);
 
