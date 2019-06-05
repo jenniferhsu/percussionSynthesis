@@ -483,7 +483,7 @@ set(gca, 'FontSize', 15);
 subplot(413)
 spectrogram(real(ySnare_s_CS), hann(256), 128, 1024, fs, 'yaxis');
 colorbar('off');
-title('Traditional MS with CS and time-varying APFs');
+title('Traditional MS with CS and time-varying AP_i(n)');
 xlim([0 600])
 ylim([0 5])
 set(gca, 'FontSize', 15);
@@ -491,7 +491,7 @@ set(gca, 'FontSize', 15);
 subplot(414)
 spectrogram(real(ySnare_z0_CS), hann(256), 128, 1024, fs, 'yaxis');
 colorbar('off');
-title('Loopback FM MS w/ CS and time-varying APFs');
+title('Loopback FM MS w/ CS and time-varying AP_i(n)');
 xlim([0 600])
 ylim([0 5])
 set(gca, 'FontSize', 15);
@@ -667,7 +667,7 @@ set(gca, 'FontSize', 15);
 subplot(413)
 spectrogram(real(yMarimba_s), hann(256), 128, 1024, fs, 'yaxis');
 colorbar('off');
-title('Traditional MS with time-varying APFs');
+title('Traditional MS with time-varying AP_i(n)');
 %xlim([0 600])
 ylim([0 10])
 set(gca, 'FontSize', 15);
@@ -675,7 +675,7 @@ set(gca, 'FontSize', 15);
 subplot(414)
 spectrogram(real(yMarimba_zc), hann(256), 128, 1024, fs, 'yaxis');
 colorbar('off');
-title('Loopback FM MS with time-varying APFs');
+title('Loopback FM MS with time-varying AP_i(n)');
 %xlim([0 600])
 ylim([0 10])
 set(gca, 'FontSize', 15);

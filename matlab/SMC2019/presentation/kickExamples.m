@@ -162,7 +162,7 @@ kick4 = applyCommutedSynthesis(kick3, resIRWav, excitationType, excitationParams
 
 if saveAudio
     audiowrite([audioDir 'hsu_kick_commutedSynthesis' '.wav'], ...
-                scaleForSavingAudio(real(kick3)), fs);
+                scaleForSavingAudio(real(kick4)), fs);
 end
 
 %% plot

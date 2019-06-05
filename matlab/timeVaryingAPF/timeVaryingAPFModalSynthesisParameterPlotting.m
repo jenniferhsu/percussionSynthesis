@@ -97,7 +97,7 @@ if plotFigures == 1
         title(sprintf('M_i=%1.f', MVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF MS for different M_i values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying AP_i(n) MS for different M_i values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -137,7 +137,7 @@ if plotFigures == 1
         title(sprintf('f_{m,i}=%1.f', fmVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying APF MS for different f_{m,i} values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying AP_i(n) MS for different f_{m,i} values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];
@@ -180,7 +180,7 @@ if plotFigures == 1
         ylim([0 8])
         title(sprintf('f_{b,i}=%1.f', fbVec(b)))
     end
-    sgtitle('spectrogram of time-varying APF MS for different f_{b,i} values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying AP_i(n) MS for different f_{b,i} values', 'fontsize', 15)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];

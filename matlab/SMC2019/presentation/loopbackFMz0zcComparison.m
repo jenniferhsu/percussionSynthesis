@@ -98,6 +98,22 @@ fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 6 4];
 print([figDir 'loopbackFM_z0HarmonicNumberVariation.eps'], '-depsc', '-r0')
 
+%% plots for the version that Tamara wants
+
+figure
+spectrogram(real(z0BInc), hann(256), 128, 1024, fs, 'yaxis');
+hold on
+plot(linspace(0, 1000, N), (w0Inc/2*pi)/10000, 'r', 'linewidth', 2);
+%title('z_0(n) with pitch glide and no timbre variation');
+ylim([0 7]);
+colorbar('off');
+set(gca, 'fontsize', 15);
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 4];
+print([figDir 'loopbackFM_z0PitchGlide.eps'], '-depsc', '-r0')
+
+
 %% save audio
 
 audiowrite([audioDir 'loopbackFM_z0PitchGlide.wav'], scaleForSavingAudio(real(z0BInc)), fs);

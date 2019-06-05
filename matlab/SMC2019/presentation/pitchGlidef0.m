@@ -56,11 +56,19 @@ for i=2:N
     yLin(i) = exp(j*wc*T*(1 + BTilde(i) * real(yLin(i-1)))) * yLin(i-1);
 end
 
-%% CLOSED FORM LOOPBACK FM LINEAR INCREASE
+%% CLOSED FORM LOOPBACK FM LINEAR INCREASE - pitch glide only
 
+b0 = -0.5;
 % Theta0 = integral[2*pi * (m*nT + b) dnT]
 Theta0 = 2*pi * (m/2 * nT.^2 + b*nT);
-YLin = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
+YLinPitchGlide = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
+
+%% CLOSED FORM LOOPBACK FM LINEAR INCREASE - harmonics change only
+
+b0 = linspace(0.01, -0.999, N);
+% Theta0 = integral[2*pi * (m*nT + b) dnT]
+Theta0 = 2*pi * (m/2 * nT.^2 + b*nT);
+YLinHarmonicsChange = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 
 %% linearly increasing pitch glide plots
@@ -68,55 +76,69 @@ YLin = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 if savePlots
     
+%     figure
+%     subplot(211)
+%     plot(n*T*1000, real(Theta0), 'linewidth', 2)
+%     grid on
+%     xlabel('Time (ms)');
+%     ylabel('\Theta_0(n) value');
+%     title('\Theta_0(n)');
+%     set(gca, 'fontsize', 15)
+%     
+%     subplot(212)
+%     plot(n*T, BTilde, 'linewidth', 2)
+%     grid on
+%     xlabel('Time (ms)');
+%     ylabel('B(n) value');
+%     title('B(n)');
+%     set(gca, 'fontsize', 15)
+%     saveas(gcf, [plotOutDir 'pitchGlideLinIncreaseBAndTheta0'], 'epsc')
+    
     figure
-    subplot(211)
-    plot(n*T*1000, real(Theta0), 'linewidth', 2)
-    grid on
-    xlabel('Time (ms)');
-    ylabel('\Theta_0(n) value');
-    title('\Theta_0(n)');
-    set(gca, 'fontsize', 15)
-    
-    subplot(212)
-    plot(n*T, BTilde, 'linewidth', 2)
-    grid on
-    xlabel('Time (ms)');
-    ylabel('B(n) value');
-    title('B(n)');
-    set(gca, 'fontsize', 15)
-    saveas(gcf, [plotOutDir 'pitchGlideLinIncreaseBAndTheta0'], 'epsc')
-    
-    
-    
-    H = figure
-    subplot(211)
-    spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
+    spectrogram(real(YLinPitchGlide), hann(1024), 512, 2048, fs, 'yaxis')
     colorbar('off')
     hold on
     plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
-    ylim([0 2])
-    title('Pitch glide increasing linearly with z_0(n)');
-    set(gca, 'fontsize', 15)
+    ylim([0 8])
+    %title('Pitch glide increasing linearly with z_0(n)');
+    set(gca, 'fontsize', 13)
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideYLinPitchGlide'], '-depsc', '-r0')
     
-    subplot(212)
+    figure
+    spectrogram(real(YLinHarmonicsChange), hann(1024), 512, 2048, fs, 'yaxis')
+    colorbar('off')
+    hold on
+    plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
+    ylim([0 8])
+    % title('Pitch glide increasing linearly with z_c(n)');
+    set(gca, 'fontsize', 15)
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideYLinHarmonicsChange'], '-depsc', '-r0')
+    
+    figure
     spectrogram(real(yLin), hann(1024), 512, 2048, fs, 'yaxis')
     colorbar('off')
     hold on
     plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
-    ylim([0 2])
-    title('Pitch glide increasing linearly with z_c(n)');
+    ylim([0 8])
+    % title('Pitch glide increasing linearly with z_c(n)');
     set(gca, 'fontsize', 15)
-    saveas(gcf, [plotOutDir 'pitchGlideLinIncrease'], 'epsc')
-%     fig = H
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [0 0 6 2.6];
-%     print([plotOutDir 'pitchGlideLinIncrease'], '-depsc', '-r0')
-    %close
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideyLin'], '-depsc', '-r0')
+
 end
 
 
 %% save audio
-audiowrite([audioDir 'pitchGlideLinIncrease_z0.wav'], scaleForSavingAudio(real(YLin) .* env), fs);
+audiowrite([audioDir 'pitchGlideLinIncrease_z0HarmonicsChange.wav'], scaleForSavingAudio(real(YLinHarmonicsChange) .* env), fs);
+audiowrite([audioDir 'pitchGlideLinIncrease_z0PitchGlide.wav'], scaleForSavingAudio(real(YLinPitchGlide) .* env), fs);
 audiowrite([audioDir 'pitchGlideLinIncrease_zc.wav'], scaleForSavingAudio(real(yLin) .* env), fs);
 
 
@@ -160,62 +182,108 @@ end
 
 %% CLOSED FORM LOOPBACK FM EXPONENTIAL DECAY
 
+b0 = -0.5;
 % Theta0 = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
 Theta0 = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
 
 %b0 = (sqrt(1 - B^2) - 1)/B;
-YExp = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
+YExpPitchGlide = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
+
+%% CLOSED FORM LOOPBACK FM HARMONICS ONLY
+
+b0 = linspace(0.01, -0.999, N);
+% Theta0 = integral [(f0_0 - f0_1) * A * exp(-nT/tau) + f0_1 dnT] <-- that's the equation
+Theta0 = (2 * pi * (f0_0 - f0_1)) * (-tau * A) * exp(-nT/tau) + (2 * pi * f0_1 * nT); 
+
+%b0 = (sqrt(1 - B^2) - 1)/B;
+YExpHarmonicsChange = (b0 + exp(1j.*Theta0)) ./ (1 + b0.*exp(1j.*Theta0));
 
 %% decaying pitch glide plots
-
-
+% 
+% 
 if savePlots
-    
+%     
+%     figure
+%     subplot(211)
+%     plot(n*T*1000, real(Theta0), 'linewidth', 2)
+%     grid on
+%     xlabel('Time (ms)');
+%     ylabel('\Theta_0(n) value');
+%     title('\Theta_0(n)');
+%     set(gca, 'fontsize', 15)
+%     
+%     subplot(212)
+%     plot(n*T, BTilde, 'linewidth', 2)
+%     grid on
+%     xlabel('Time (ms)');
+%     ylabel('B(n) value');
+%     title('B(n)');
+%     set(gca, 'fontsize', 15)
+%     saveas(gcf, [plotOutDir 'pitchGlideExpDecayBAndTheta0'], 'epsc')
+%     
+%     H = figure
+%     subplot(211)
+%     spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
+%     colorbar('off')
+%     hold on
+%     plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
+%     ylim([0 2])
+%     colorbar('off')
+%     title('Pitch glide decreasing exponentially with z_0(n)');
+%     set(gca, 'fontsize', 15)
+%     subplot(212)
+%     spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
+%     colorbar('off')
+%     hold on
+%     plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
+%     ylim([0 2])
+%     colorbar('off')
+%     title('Pitch glide decreasing exponentially with z_c(n)');
+%     set(gca, 'fontsize', 15)
+%     saveas(gcf, [plotOutDir 'pitchGlideExpDecay'], 'epsc')
+
     figure
-    subplot(211)
-    plot(n*T*1000, real(Theta0), 'linewidth', 2)
-    grid on
-    xlabel('Time (ms)');
-    ylabel('\Theta_0(n) value');
-    title('\Theta_0(n)');
-    set(gca, 'fontsize', 15)
-    
-    subplot(212)
-    plot(n*T, BTilde, 'linewidth', 2)
-    grid on
-    xlabel('Time (ms)');
-    ylabel('B(n) value');
-    title('B(n)');
-    set(gca, 'fontsize', 15)
-    saveas(gcf, [plotOutDir 'pitchGlideExpDecayBAndTheta0'], 'epsc')
-    
-    H = figure
-    subplot(211)
-    spectrogram(real(YExp), hann(1024), 512, 2048, fs, 'yaxis')
+    spectrogram(real(YExpPitchGlide), hann(1024), 512, 2048, fs, 'yaxis')
     colorbar('off')
     hold on
     plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
-    ylim([0 2])
+    ylim([0 8])
+    %title('Pitch glide increasing linearly with z_0(n)');
+    set(gca, 'fontsize', 13)
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideYExpPitchGlide'], '-depsc', '-r0')
+    
+    figure
+    spectrogram(real(YExpHarmonicsChange), hann(1024), 512, 2048, fs, 'yaxis')
     colorbar('off')
-    title('Pitch glide decreasing exponentially with z_0(n)');
+    hold on
+    plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
+    ylim([0 8])
+    % title('Pitch glide increasing linearly with z_c(n)');
     set(gca, 'fontsize', 15)
-    subplot(212)
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideYExpHarmonicsChange'], '-depsc', '-r0')
+    
+    figure
     spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
     colorbar('off')
     hold on
     plot(n*T*1000, f0Exp/1000, 'r', 'linewidth', 2)
-    ylim([0 2])
-    colorbar('off')
-    title('Pitch glide decreasing exponentially with z_c(n)');
+    ylim([0 8])
+    % title('Pitch glide increasing linearly with z_c(n)');
     set(gca, 'fontsize', 15)
-    saveas(gcf, [plotOutDir 'pitchGlideExpDecay'], 'epsc')
-%     fig = H
-%     fig.PaperUnits = 'inches';
-%     fig.PaperPosition = [0 0 6 2.6];
-%     print([plotOutDir 'pitchGlideExpDecay'], '-depsc', '-r0')
-    %close
+    fig = gcf
+    fig.PaperUnits = 'inches';
+    fig.PaperPosition = [0 0 6 3];
+    print([plotOutDir 'pitchGlideyExp'], '-depsc', '-r0')
+
 end
 
 %% save audio
-audiowrite([audioDir 'pitchGlideExpDecay_z0.wav'], scaleForSavingAudio(real(YExp) .* env), fs);
+audiowrite([audioDir 'pitchGlideExpDecay_z0HarmonicsChange.wav'], scaleForSavingAudio(real(YExpHarmonicsChange) .* env), fs);
+audiowrite([audioDir 'pitchGlideExpDecay_z0PitchGlide.wav'], scaleForSavingAudio(real(YExpPitchGlide) .* env), fs);
 audiowrite([audioDir 'pitchGlideExpDecay_zc.wav'], scaleForSavingAudio(real(yExp) .* env), fs);

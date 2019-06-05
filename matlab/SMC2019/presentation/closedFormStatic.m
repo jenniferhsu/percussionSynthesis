@@ -13,6 +13,7 @@ audioDir = 'audioExamples/';
 % derived parameters
 N = fs*dur;
 n = 0:1:N-1;
+T = 1/fs;
 
 % fft parameters
 Nfft = 2^nextpow2(N);
@@ -28,7 +29,7 @@ env = [ones(1, N-fadeSamps) linspace(1, 0, fadeSamps)];
 %% changing w0
 
 f0Vec = [220, 261.63, 329.63, 392, 493.88, 587.33];
-b0 = 0.5;
+b0 = -0.5;
 Nf = length(f0Vec);
 
 z0Matf0 = zeros(Nf, N);
@@ -47,7 +48,7 @@ end
 
 %% changing b0
 
-b0Vec = [0:0.2:0.8 0.9];
+b0Vec = -[0:0.2:0.8 0.9];
 f0 = 392;
 w0 = 2*pi*f0;
 Nb0 = length(b0Vec);
@@ -75,18 +76,21 @@ for i=1:Nf
     figure
     subplot(211)
     plot(n*T, real(z0Matf0(i,:)), 'linewidth', 2);
-    xlabel('Time (seconds)');
-    ylabel('Amplitude (linear)');
+    %xlabel('Time (seconds)');
+    %ylabel('Amplitude (linear)');
+    title('Time-domain waveform');
     xlim([0 0.1])
     set(gca, 'fontsize', 13);
     grid on
     
     subplot(212)
     plot(faxis, 20*log10(abs(Z0Matf0Pos(i,:))/max(abs(Z0Matf0Pos(i,:)))), 'linewidth', 2);
+    %plot(faxis, abs(Z0Matf0Pos(i,:)), 'linewidth', 2);
     hold on
     plot([f0 f0], [-60 0], 'r', 'linewidth', 2);
-    xlabel('Frequency (Hz)')
-    ylabel('Magnitude (dB)')
+    %xlabel('Frequency (Hz)')
+    %ylabel('Magnitude (dB)')
+    title('Magnitude spectrum');
     xlim([0 6000]);
     ylim([-60 0]);
     grid on
@@ -94,9 +98,9 @@ for i=1:Nf
     
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 6 5];
+    fig.PaperPosition = [0 0 6 3];
     print([figDir 'closedForm_f0' num2str(f0) '.eps'], '-depsc', '-r0')
-    close
+    %close
 end
 
 % changing b0 for static equations
@@ -106,8 +110,9 @@ for i=1:Nb0
     figure
     subplot(211)
     plot(n*T, real(z0Matb0(i,:)), 'linewidth', 2);
-    xlabel('Time (seconds)');
-    ylabel('Amplitude (linear)');
+    %xlabel('Time (seconds)');
+    %ylabel('Amplitude (linear)');
+    title('Time-domain waveform');
     xlim([0 0.01])
     set(gca, 'fontsize', 13);
     grid on
@@ -116,8 +121,9 @@ for i=1:Nb0
     plot(faxis, 20*log10(abs(Z0Matb0Pos(i,:))/max(abs(Z0Matb0Pos(i,:)))), 'linewidth', 2);
     hold on
     plot([392 392], [-60 0], 'r--', 'linewidth', 2);
-    xlabel('Frequency (Hz)')
-    ylabel('Magnitude (dB)')
+    %xlabel('Frequency (Hz)')
+    %ylabel('Magnitude (dB)')
+    title('Magnitude spectrum');
     xlim([0 12000]);
     ylim([-60 0]);
     grid on
@@ -125,10 +131,14 @@ for i=1:Nb0
     
     fig = gcf;
     fig.PaperUnits = 'inches';
-    fig.PaperPosition = [0 0 6 5];
+    fig.PaperPosition = [0 0 6 3];
     print([figDir 'closedForm_b0' num2str(b0) '.eps'], '-depsc', '-r0')
     close
 end
+
+
+
+
 
 
 %% save audio

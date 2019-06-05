@@ -51,7 +51,11 @@ a0 = 1/exp(-1/tau);
 aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
                                             % starting amplitudes
 
-e = g.^(linspace(0, N, N));   % exponential decay
+%e = g.^(linspace(0, N, N));   % exponential decay
+T60 = 1.4;
+tau = -T60/log(0.001);
+e = exp(-(0:N-1)*T/tau);
+
 
 env = zeros(Nf, N);
 for i=1:Nf
@@ -75,13 +79,13 @@ argStruct.sinusoidArgs.zcArgsVec = zeros(1, Nf);
 % loopback FM z0 parameters
 argStruct.z0Args = struct();
 argStruct.z0Args.f0Vec = fVecMembrane;
-argStruct.z0Args.f0EndVec = fVecMembrane / 1.3;
+argStruct.z0Args.f0EndVec = fVecMembrane .* [0.75 0.69 0.71 0.73 0.74 0.76 0.7];
 argStruct.z0Args.pitchGlideTypeVec = cell(1, Nf);
 b0 = -0.3;
 
 for f=1:Nf
     argStruct.z0Args.pitchGlideTypeVec{f} = 'exp';
-    argStruct.z0Args.b0Mat(f,:) = b0*ones(1, N);
+    argStruct.z0Args.b0Mat(f,:) = -0.05*ones(1, N);
     argStruct.z0Args.zcArgsVec(f) = struct();
 end
 for f=1:Nf % not sure why i have to do this here...

@@ -28,7 +28,8 @@ env = [ones(1, N-fadeSamps) linspace(1, 0, fadeSamps)];
 %% loopback FM sound examples for different B
 
 wc = 2*pi*440;
-BVals = [0:0.2:0.8 0.9 0.99];
+%BVals = [0:0.2:0.8 0.9 0.99];
+BVals = [0 0.5 0.99]
 NB = length(BVals);
 
 w0Vals = wc*sqrt(1 - BVals.^2);
@@ -132,6 +133,43 @@ fig = gcf;
 fig.PaperUnits = 'inches';
 fig.PaperPosition = [0 0 6 5];
 print([figDir 'loopbackFM_BDec.eps'], '-depsc', '-r0')
+
+%% plots for the version that Tamara wants
+
+figure
+for nb=1:NB
+    B = BVals(nb);
+    subplot(3, 1, nb)
+    %spectrogram(real(zcMat(nb,:)), hann(256), 128, 1024, fs, 'yaxis');
+    plot(faxis, 20*log10(abs(ZcPosMat(nb,:))/max(abs(ZcPosMat(nb,:)))), 'linewidth', 2);
+    hold on
+    plot([wc/(2*pi) wc/(2*pi)], [-60 0], 'g', 'linewidth', 2);
+    plot([f0Vals(nb) f0Vals(nb)], [-60 0], 'r--', 'linewidth', 2);
+    xlim([0 3000]);
+    ylim([-60 0]);
+    %title(sprintf('B = %.2f, \\omega _0 = 2\\pi%.1f ', BVals(nb), w0Vals(nb)/(2*pi)));
+%     if nb~=NB
+%         set(gca,'XTick',[], 'YTick', [])
+%     else
+%         set(gca,'YTick', [])
+%     end
+    set(gca,'linewidth', 3)
+    set(gca, 'fontsize', 15);
+    grid on
+end
+
+
+
+%xlabel('Frequency (Hz)')
+%ylabel('Magnitude (dB)')
+
+
+
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 9];
+print([figDir 'loopbackFM_BVal2' '.eps'], '-depsc', '-r0')
+close
 
 
 %% B increasing plot #2 for z0 and zc comparison slide
