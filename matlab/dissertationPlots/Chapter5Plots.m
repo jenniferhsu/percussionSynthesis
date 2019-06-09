@@ -68,7 +68,7 @@ xlim([0 1000])
 ylim([0 2])
 set(gca, 'FontSize', 15);
 set(gca, 'XTick', [200 400 600 800 1000], 'XTickLabel', [200 400 600 800 1000])
-sgtitle('Kick drum example: static pitch and timbre')
+sgtitle('Kick drum example: static pitch and timbre', 'FontSize', 22);
 if savePlots
     saveas(gcf, [figDir filePrefix 'kickStaticPitchAndTimbre'], 'epsc')
 end
@@ -207,7 +207,7 @@ xlim([0 1000])
 ylim([0 1])
 set(gca, 'FontSize', 15);
 set(gca, 'XTick', [200 400 600 800 1000], 'XTickLabel', [200 400 600 800 1000])
-sgtitle('Kick drum example: exponentially decreasing pitch glide')
+sgtitle('Kick drum example: exponentially decreasing pitch glide', 'FontSize', 22)
 if savePlots
     saveas(gcf, [figDir filePrefix 'kickPitchGlide'], 'epsc')
 end

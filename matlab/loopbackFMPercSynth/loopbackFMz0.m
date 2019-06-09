@@ -58,8 +58,10 @@ elseif strcmp(pitchGlideType, 'exp')
     a = varargin{1};
     T60 = a.T60;
     n60 = T60*fs;
-    tau_d = -N*T/log(0.001/1);
-    d = 1*exp(-n60*T/tau_d);
+    %tau_d = -N*T/log(0.001/1);
+    tau_d = -n60*T/log(0.001/1);
+    %d = 1*exp(-n60*T/tau_d);
+    d = 1*exp(-n*T/tau_d);
     pitchGlide = (f0 - f0End)*d + f0End;
     Theta0 = -2*pi*(f0 - f0End)*tau_d*1*exp(-n*T/tau_d) + 2*pi*f0End*n*T;
 elseif strcmp(pitchGlideType, 'sqrt')

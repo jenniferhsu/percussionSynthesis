@@ -83,18 +83,20 @@ if savePlots
     H = figure
     subplot(211)
     spectrogram(real(YLin), hann(1024), 512, 2048, fs, 'yaxis')
+    colorbar('off')
     hold on
     plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
     ylim([0 2])
     title('Pitch glide increasing linearly with z_0(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     subplot(212)
     spectrogram(real(yLin), hann(1024), 512, 2048, fs, 'yaxis')
+    colorbar('off')
     hold on
     plot(n*T*1000, f0Lin/1000, 'r', 'linewidth', 2)
     ylim([0 2])
     title('Pitch glide increasing linearly with z_c(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     saveas(gcf, [plotOutDir 'pitchGlideLinIncrease'], 'epsc')
 %     fig = H
 %     fig.PaperUnits = 'inches';
@@ -178,7 +180,7 @@ if savePlots
     ylim([0 2])
     colorbar('off')
     title('Pitch glide decreasing exponentially with z_0(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     subplot(212)
     spectrogram(real(yExp), hann(1024), 512, 2048, fs, 'yaxis')
     hold on
@@ -186,7 +188,7 @@ if savePlots
     ylim([0 2])
     colorbar('off')
     title('Pitch glide decreasing exponentially with z_c(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     saveas(gcf, [plotOutDir 'pitchGlideExpDecay'], 'epsc')
 %     fig = H
 %     fig.PaperUnits = 'inches';
@@ -262,21 +264,23 @@ if savePlots
     H = figure
     subplot(211)
     spectrogram(real(YSqrt), hann(1024), 512, 2048, fs, 'yaxis')
+    ylabel('Freq (kHz)');
     hold on
     plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
     ylim([0 3])
     colorbar('off')
     title('Pitch glide increasing by a square root function with z_0(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     
     subplot(212)
     spectrogram(real(ySqrt), hann(1024), 512, 2048, fs, 'yaxis')
+    ylabel('Freq (kHz)');
     hold on
     plot(n*T*1000, f0Sqrt/1000, 'r', 'linewidth', 2)
     ylim([0 3])
     colorbar('off')
     title('Pitch glide increasing by a square root function with z_c(n)');
-    set(gca, 'fontsize', 15)
+    set(gca, 'fontsize', 18)
     saveas(H, [plotOutDir 'pitchGlideSqrtIncrease'], 'epsc')
 %     fig = gcf
 %     fig.PaperUnits = 'inches';

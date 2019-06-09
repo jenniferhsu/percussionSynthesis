@@ -75,10 +75,12 @@ end
 figure
 subplot(211)
 spectrogram(real(yzcModal_low1), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{c,i}(n), f_{c,i}=2000Hz')
 set(gca,'FontSize',15)
 subplot(212)
 spectrogram(real(yz0Modal_low1), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{0,i}(n), f_{c,i}=2000Hz')
 set(gca,'FontSize',15)
 if savePlots
@@ -149,10 +151,12 @@ end
 figure
 subplot(211)
 spectrogram(real(yzcModal_high1), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{c,i}(n), f_{c,i}=4000Hz')
 set(gca,'FontSize',15)
 subplot(212)
 spectrogram(real(yz0Modal_high1), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{0,i}(n), f_{c,i}=4000Hz')
 set(gca,'FontSize',15)
 if savePlots
@@ -300,14 +304,17 @@ end
 figure
 subplot(311)
 spectrogram(real(z0_static), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('MS using z_{0,i}(n) oscillators, static timbre, b_{0,i}=-0.6312')
 set(gca,'FontSize',14)
 subplot(312)
 spectrogram(real(z0_tv), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('MS using z_{0,i}(n) oscillators, time-varying timbre, b_{0,i}(n)')
 set(gca,'FontSize',14)
 subplot(313)
 spectrogram(real(zc_tv), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('MS using z_{c,i}(n) oscillators, time-varying timbre, B_i(n)')
 set(gca,'FontSize',14)
 fig = gcf;
@@ -450,10 +457,12 @@ argStruct.zcArgs.fcVec = fcVecModal_high2;
 figure
 subplot(211)
 spectrogram(real(zc_fcIsModal), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Loopback FM modal synthesis with f_{c,i} = f_{r,i}')
 set(gca,'FontSize',15)
 subplot(212)
 spectrogram(real(zc_f0IsModal), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Loopback FM modal synthesis with f_{0,i} = f_{r,i}')
 set(gca,'FontSize',15)
 if savePlots
@@ -493,6 +502,9 @@ for f=1:Nf
 end
 for f=1:Nf
     argStruct.z0Args.zcArgsVec(f) = struct();
+end
+for f=1:Nf
+    argStruct.z0Args.zcArgsVec(f).T60 = 1.0;
 end
 [mz0SamePitchGlide, mz0Mat] = loopbackFMMS('z0', env, argStruct, fs);
 
@@ -590,10 +602,12 @@ end
 figure
 subplot(211)
 spectrogram(real(yzcModal_high2), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{c,i}(n) oscillators with pitch glide, f_{c,i}=4000Hz')
 set(gca,'FontSize',15)
 subplot(212)
 spectrogram(real(yz0Modal_high2), hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 title('Spectrogram of MS using z_{0,i}(n) oscillators with pitch glide, f_{c,i}=4000Hz')
 set(gca,'FontSize',15)
 if savePlots

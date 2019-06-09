@@ -18,7 +18,7 @@ addpath(genpath('../proofOfConcept'));
 
 % general
 fs = 44100;
-dur = 2;
+dur = 1;
 plotSpectrograms = 1;
 writeAudioFiles = 1;
 outDir = 'audioExamples/marimba/';
@@ -70,7 +70,10 @@ a0 = 1/exp(-1/tau);
 aStart(2:Nf-1) = a0*exp(-(2:Nf-1)/tau);     % exponentially decreasing 
                                             % starting amplitudes
 
-e = g.^(linspace(0, N, N));   % exponential decay
+%e = g.^(linspace(0, N, N));   % exponential decay
+T60 = 0.8;
+tau = -T60/log(0.001);
+e = exp(-linspace(0, N-1, N)*T/tau);
 
 env = zeros(Nf, N);
 for i=1:Nf

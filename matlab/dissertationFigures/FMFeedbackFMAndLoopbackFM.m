@@ -56,7 +56,7 @@ ylim([-60 0]);
 xlabel('Frequency (Hz)');
 ylabel('Amplitude (dB)');
 title('Magnitude spectrum of z_{fm,c}(n)');
-set(gca, 'FontSize', 15)
+set(gca, 'FontSize', 20)
 grid on;
 legend('z_{fm,c}', 'f_c');
 if saveDissertationFigures==1
@@ -107,7 +107,7 @@ ylim([-60 0]);
 xlabel('Frequency (Hz)');
 ylabel('Amplitude (dB)');
 title('Magnitude spectrum of z_{fb}(n)');
-set(gca, 'FontSize', 15)
+set(gca, 'FontSize', 20)
 grid on;
 legend('z_{fb}', 'f_c')
 if saveDissertationFigures==1
@@ -148,7 +148,7 @@ for i=1:length(BVec)
     xlabel('Frequency (Hz)');
     ylabel('Amplitude (dB)');
     title(sprintf('Magnitude spectrum of z_{c}(n), B=%.1f', B));
-    set(gca, 'FontSize', 15)
+    set(gca, 'FontSize', 20)
     grid on;
     legend('z_c', 'f_c', 'f_0');
     if saveDissertationFigures==1
@@ -193,7 +193,7 @@ title('z_{c}(n)');
 % plot([f0 f0], [-60 0], 'r--')
 xlim([faxis(1) faxis(end)])
 ylim([-60 0])
-set(gca, 'FontSize', 12)
+set(gca, 'FontSize', 20)
 grid on;
 
 subplot(212)
@@ -205,10 +205,10 @@ title('z_{0}(n)');
 % plot([f0 f0], [-60 0], 'r--')
 xlim([faxis(1) faxis(end)])
 ylim([-60 0])
-set(gca, 'FontSize', 12)
+set(gca, 'FontSize', 20)
 grid on;
 sgt = sgtitle(sprintf('Magnitude spectrum comparison for f_c=%d, B=%.2f', fc, B));
-sgt.FontSize = 15;
+sgt.FontSize = 20;
 if saveDissertationFigures==1
     fig = gcf;
     saveas(gcf, ['figures/LoopbackFMClosedFormMagSpecComparison'], 'epsc')
@@ -257,20 +257,22 @@ figure
 
 subplot(211)
 spectrogram(real(zcTV), hann(1024), 512, 2048, fs, 'yaxis')
+colorbar('off')
 hold on
 plot(nT*1000, f0Decay/1000, 'r')
 ylim([0 1])
 title('z_c(n)');
-set(gca, 'FontSize', 12)
+set(gca, 'FontSize', 20)
 subplot(212)
 spectrogram(real(z0TV), hann(1024), 512, 2048, fs, 'yaxis')
+colorbar('off')
 hold on
 plot(nT*1000, f0Decay/1000, 'r')
 ylim([0 1])
 title('z_0(n)');
-set(gca, 'FontSize', 12)
+set(gca, 'FontSize', 20)
 sgt = sgtitle('Spectrograms of loopback FM with exponentially decaying pitch glides');
-sgt.FontSize = 15;
+sgt.FontSize = 18;
 if saveDissertationFigures==1
     fig = gcf;
     saveas(gcf, ['figures/LoopbackFMClosedFormTimeVaryingComparison'], 'epsc')

@@ -60,12 +60,16 @@ if savePlots
     H = figure
     subplot(211)
     spectrogram(real(y0Lin), hann(1024), 512, 2048, fs, 'yaxis')
-    title('Timbre variation with linearly increasing $b_0(n)$ using z_0(n)');
-    set(gca, 'fontsize', 15)
+    ylabel('Freq (Hz)')
+    colorbar('off');
+    title('Varying number of harmonics with linearly increasing b_0(n) using z_0(n)');
+    set(gca, 'fontsize', 18)
     subplot(212)
     spectrogram(real(ycLin), hann(1024), 512, 2048, fs, 'yaxis')
-    title('Timbre variation with linearly increasing $b_0(n)$ using z_c(n)');
-    set(gca, 'fontsize', 15)
+    ylabel('Freq (Hz)')
+    colorbar('off');
+    title('Varying number of harmonics with linearly increasing b_0(n) using z_c(n)');
+    set(gca, 'fontsize', 18)
     saveas(gcf, [plotOutDir 'timbreVariationLinIncrease'], 'epsc')
 %     fig = H
 %     fig.PaperUnits = 'inches';
@@ -83,7 +87,7 @@ if savePlots
     grid on
     xlabel('Time (seconds)')
     ylabel('B(n)')
-    sgtitle('Linearly increasing b_0(n) and corresponding B(n) function');
+    sgtitle('Linearly increasing b_0(n) and corresponding B(n) function', 'fontsize', 18);
     saveas(gcf, [plotOutDir 'timbreVariationLinb0B'], 'epsc')
 end
 
@@ -111,23 +115,27 @@ figure
 subplot(211)
 spectrogram(real(y0Exp), hann(1024), 512, 2048, fs, 'yaxis')
 %ylim([0 1])
-title('Timbre variation with exponentially decreasing b_0(n) with z_0(n)');
+title('Varying number of harmonics with exponentially decreasing b_0(n) with z_0(n)');
 colorbar('off')
 subplot(212)
 spectrogram(real(ycExp), hann(1024), 512, 2048, fs, 'yaxis')
 %ylim([0 1])
-title('Timbre variation with exponentially decreasing b_0(n) with z_c(n)');
+title('Varying number of harmonics with exponentially decreasing b_0(n) with z_c(n)');
 colorbar('off')
 
 if savePlots
     H = figure
     subplot(211)
     spectrogram(real(y0Exp), hann(1024), 512, 2048, fs, 'yaxis')
-    title('Timbre variation with exponentially decreasing $b_0(n)$ using z_0(n)');
+    ylabel('Freq (Hz)')
+    colorbar('off')
+    title('Varying number of harmonics with exponentially decreasing b_0(n) using z_0(n)');
     set(gca, 'fontsize', 15)
     subplot(212)
     spectrogram(real(ycExp), hann(1024), 512, 2048, fs, 'yaxis')
-    title('Timbre variation with exponentially decreasing $b_0(n)$ using z_c(n)');
+    ylabel('Freq (Hz)')
+    colorbar('off')
+    title('Varying number of harmonics with exponentially decreasing b_0(n) using z_c(n)');
     set(gca, 'fontsize', 15)
     saveas(gcf, [plotOutDir 'timbreVariationExpDecrease'], 'epsc')
 %     fig = H
@@ -146,6 +154,6 @@ if savePlots
     grid on
     xlabel('Time (seconds)')
     ylabel('B(n)')
-    sgtitle('Exponentially decreasing b_0(n) and corresponding B(n) function');
+    sgtitle('Exponentially decreasing b_0(n) and corresponding B(n) function', 'fontsize', 18);
     saveas(gcf, [plotOutDir 'timbreVariationExpb0B'], 'epsc')
 end

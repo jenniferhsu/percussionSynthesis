@@ -213,6 +213,7 @@ if plotFigures==1
     % modal synthesis with f_low=2000
     figure
     spectrogram(real(yMSTVAPF_low), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('Spectrogram of time-varying allpass filtered MS, f_c=2000Hz')
     set(gca,'FontSize',15)
     ylim([0 8]);
@@ -228,10 +229,12 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low1), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('Loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_low1), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('AP_i(n) with loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
@@ -242,10 +245,12 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_low2), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('Loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_low2), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('AP_i(n) with loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
@@ -256,10 +261,12 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high1), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('Loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_high1), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('AP_i(n) with loopback FM MS spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1
@@ -270,10 +277,12 @@ if plotFigures==1
     figure
     subplot(211)
     spectrogram(real(yFBFMModal_high2), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('Loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     subplot(212)
     spectrogram(real(yLBTVAPF_high2), hann(256), 128, 1024, fs, 'yaxis');
+    colorbar('off');
     title('AP_i(n) with loopback FM MS with pitch glide spectrogram')
     set(gca,'FontSize',15)
     if saveFigures==1

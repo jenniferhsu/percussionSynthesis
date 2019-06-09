@@ -97,7 +97,7 @@ if plotFigures == 1
         title(sprintf('M_i=%1.f', MVec(m)), 'fontsize', 15)
         ylim([0 20])
     end
-    sgtitle('spectrogram of time-varying AP_i(n) MS for different M_i values', 'fontsize', 15)
+    sgtitle('spectrogram of time-varying AP_i(n) MS for different M_i values', 'fontsize', 13)
     if saveFigures == 1
         fig.PaperUnits = 'inches';
         fig.PaperPosition = [0 0 6 6];

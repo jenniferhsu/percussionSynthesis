@@ -354,13 +354,15 @@ title('Static loopback FM filtered by a time-varying allpass mag spectrum');
 figure
 subplot(211)
 spectrogram(htv, hann(256), 128, 1024, fs, 'yaxis');
-title('loopback FM spectrogram')
+colorbar('off')
+title('Loopback FM spectrogram')
 set(gca, 'fontsize', 15)
 ylim([0 18])
 subplot(212)
 spectrogram(yLBTV, hann(256), 128, 1024, fs, 'yaxis');
+colorbar('off')
 set(gca, 'fontsize', 15)
-title('time-varying allpass filtered loopback FM spectrogram')
+title('Time-varying allpass filtered loopback FM spectrogram')
 set(gca, 'fontsize', 15)
 ylim([0 18])
 print('figures/timeVaryingAPFTVLoopbackFM', '-depsc', '-r0')
