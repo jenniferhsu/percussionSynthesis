@@ -53,7 +53,38 @@ print([outDir 'excitation_derivative'], '-deps', '-r0')
 %%%%%%%%%%%%%%%%%%%%%%%%
 
 % look at stretchedAPFSynthesis.m in proofOfConcept directory and print
-% from there
+% from there (envelopes are in there in my new update)
+
+Nf = 3;
+oscN = 500;
+osc = zeros(Nf, oscN);
+fVec = [233, 468, 706];
+n = linspace(0, oscN-1, oscN);
+b0 = -0.5;
+for f=1:Nf
+    osc(f,:) = (b0 + exp(j*2*pi*fVec(f)*n*T)) ./ (1 + b0*exp(j*2*pi*fVec(f)*n*T));
+end
+
+
+% LOOPBACK FM WITH ADDITIVE SYNTHESIS
+figure
+subplot(311); plot(real(osc(1, 1:oscN)), 'linewidth', 2)
+set(gca,'linewidth', 3)
+set(gca,'XTick',[], 'YTick', [])
+
+subplot(312); plot(real(osc(2, 1:oscN)), 'linewidth', 2)
+set(gca,'linewidth', 3)
+set(gca,'XTick',[], 'YTick', [])
+
+subplot(313); plot(real(osc(3, 1:oscN)), 'linewidth', 2)
+set(gca,'linewidth', 3)
+set(gca,'XTick',[], 'YTick', [])
+
+fig = gcf;
+fig.PaperUnits = 'inches';
+fig.PaperPosition = [0 0 6 6];
+print(['~/Documents/ucsd/winter2019/smc/background_planning/figure_making/' 'loopbackFMOsc2'], '-deps', '-r0')
+
 
 %% RESONANT BODY IMPULSE RESPONSE
 %%%%%%%%%%%%%%%%%
